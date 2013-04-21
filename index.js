@@ -35,7 +35,6 @@ var http = require('http');
 var url = require('url');
 var bundle = require('./module/bundle.js');
 var context = require('./context.js');
-var event = require('./event.js');
 
 module.exports = function() {
     return new newSaram();
@@ -57,7 +56,6 @@ function newSaram() {
     this.moduleContents = {};
     this.moduleObjects = {};
     this.pipeBundle = new bundle();
-    this.event = new event();
 
     var rootPipe = {type:"WELD", name:"root", url:"/", action:"root"};
     initPipe(this, rootPipe);
@@ -157,6 +155,7 @@ function saramWeld(parentMid, childMid, path, weld) {
 function saramAddReceiver(targetMid, eventName, receiverMid, action) {
     var targetObject = this.getModuleObjectByMid(targetMid);
     var receiverObject = this.getModuleObjectByMid(receiverMid);
+    var receiverContent = this.getModuleContentByName(receiverObject.getModuleName());
 
     if(!targetObject) {
         console.log(targetMid + " ModuleObject가 존재하지 않습니다.");
@@ -172,7 +171,7 @@ function saramAddReceiver(targetMid, eventName, receiverMid, action) {
         targetObject.event[eventName] = event;
     }
 
-    event.push({receiverObject:receiverObject, action:action});
+    event.push({receiverContent:receiverContent, receiverObject:receiverObject, action:action});
 }
 
 function weldRoutine(saram, parentMid, childMid, path, weld) {
@@ -282,7 +281,6 @@ function request(saram, ctx) {
 
     ctx.mObj = nowPipe.moduleObject.obj;
     var actionName = nowPipe.pipe.action;
-    var actionFunc = nowPipe.moduleContent.actions[actionName];
 
     //파라미터
     ctx.req.param = {};
@@ -294,24 +292,43 @@ function request(saram, ctx) {
         ctx.req.param[nowPipe.pipe.rawPath.param[index-1]] = nowPipe.match[index];
     }
 
-    //다음 호출
-    var step = function(){
-        //"call.actionName.after"
-        request(saram, ctx);
-    };
+    callAction(nowPipe.moduleContent, nowPipe.moduleObject, actionName, ctx, function(){request(saram, ctx);});
+}
 
-    //callEvent(nowPipe.moduleObject, "call." + +".before")
-
-    //"call.actionName.before"
-
-    if(!actionFunc || typeof(actionFunc(ctx, step)) == "undefined") {
-        step();
+function callEvent(moduleObject, event, ctx, callback) {
+    var receiverList = moduleObject.event[event];
+    if(!receiverList) {
+        callback();
         return;
     }
-}
-/*
-function callEvent(moduleObject, event, step) {
+
+    callReceiver(receiverList.slice(0), ctx, callback);
 }
 
-function callAction(func, step) {
-} */
+function callReceiver(receiverList, ctx, callback) {
+    var receiver = receiverList.shift();
+    if(!receiver) {
+        callback();
+        return;
+    }
+
+    callAction(receiver.receiverContent, receiver.receiverObject, receiver.action, ctx, function(){
+        callReceiver(receiverList, ctx, callback);
+    });
+}
+
+function callAction(moduleContent, moduleObject, actionName, ctx, step) {
+    callEvent(moduleObject, "call." + actionName +".before", ctx, function() {
+        var newStep = function() {
+            callEvent(moduleObject, "call." + actionName +".after", ctx, function() {
+                step();
+            });
+        }
+
+        var actionFunc = moduleContent.actions[actionName];
+        if(!actionFunc || typeof(actionFunc(ctx, newStep)) == "undefined") {
+            newStep();
+        }
+    });
+
+}

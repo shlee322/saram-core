@@ -16,5 +16,7 @@ module.exports = {
     },
     get_param : function (ctx, step) {
         console.log(ctx.req.param);
+        ctx.res.writeHead(200);
+        ctx.res.end("test");
     }
 }
