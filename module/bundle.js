@@ -1,3 +1,11 @@
+/**
+ * @namespace: Pipe Bundle (http://saram.elab.kr)
+ * @author: Lee Sanghyuck (http://profile.elab.kr)
+ * @version: 0.1
+ * @since: 2013.04.20
+ * @description: Saram Pipe Bundle 입니다.
+ *
+ */
 module.exports = function() {
     this.weldList = {}; //name 기준
 
@@ -7,6 +15,13 @@ module.exports = function() {
     this.put = [];
     this.delete = [];
 
+    /**
+     * 다른 Bundle를 해당 Bundle 아래에 연결
+     *
+     * @param path 경로
+     * @param childBundle 자식 Bundle
+     * @param weld 특정 weld만 연결(선택)
+     */
     this.weld = function(path, childBundle, weld) {
         var target = weld;
         if(target == null) {
@@ -28,6 +43,10 @@ module.exports = function() {
         }
     };
 
+    /**
+     * 자식 파이프 추가
+     * @param pipe 추가할 파이프
+     */
     this.addPipe = function(pipe) {
         var pipeObject = getPipeObject(this, pipe.type);
         if(pipeObject instanceof Array) {
@@ -37,6 +56,13 @@ module.exports = function() {
         }
     };
 
+    /**
+     * 요청을 분석하여 요청에 맞는 파이프 라인을 생성하는 함수
+     *
+     * @param pipeType 파이프 종류
+     * @param path 경로
+     * @returns {*} pipeline
+     */
     this.getPipeline = function(pipeType, path) {
         //weldedBundle 탐색
         var weldedBundlePipeline = getWeldedBundlePipeline(this, pipeType, path);
@@ -59,6 +85,13 @@ module.exports = function() {
     }
 }
 
+/**
+ * 파이프 타입에 따라 해당 파이프 리스트를 리턴하는 함수
+ *
+ * @param bundleObject 파이프를 추출할 Bundle
+ * @param type 파이프 타입
+ * @returns {*} 파이프 리스트
+ */
 function getPipeObject(bundleObject, type) {
     var pipeObject = getHttpPipeObject(bundleObject, type);
     if(!pipeObject) {
@@ -70,6 +103,13 @@ function getPipeObject(bundleObject, type) {
     return bundleObject.get;
 }
 
+/**
+ * getPipeObject 함수와 같음. (단, HTTP 메소드에 한함)
+ *
+ * @param bundleObject 파이프를 추출할 Bundle
+ * @param type 파이프 타입
+ * @returns {*} 파이프 리스트
+ */
 function getHttpPipeObject(bundleObject, type) {
     if(type.toLowerCase() == 'get') {
         return bundleObject.get;
@@ -84,6 +124,14 @@ function getHttpPipeObject(bundleObject, type) {
     return null;
 }
 
+/**
+ * 자식 Bundle에서 파이프라인을 추출하는 함수
+ *
+ * @param bundleObject 파이프를 추출할 Bundle
+ * @param pipeType 파이프 타입
+ * @param path 경로
+ * @returns {*} 추출된 파이프라인
+ */
 function getWeldedBundlePipeline(bundleObject, pipeType, path) {
     if('/' == path)
         return {found:false};

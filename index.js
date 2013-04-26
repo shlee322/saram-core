@@ -1,6 +1,6 @@
 /**
  * @namespace: Saram Core (http://saram.elab.kr)
- * @author: Lee Sanghyuck(http://profile.elab.kr)
+ * @author: Lee Sanghyuck (http://profile.elab.kr)
  * @version: 0.1
  * @since: 2013.04.20
  * @description: Saram의 중심체 입니다.
@@ -13,7 +13,7 @@
  * pipeline : 요청이 왔을때 응답할 파이프의 묶음
  * pipe : 개개의 처리 과정
  * weld : 상위 모듈의 파이프에서 하위 모듈의 파이프로 연결
- * bundle
+ * bundle : 각종 pipe와 weld를 가지고 있는 객체
  * perm : read, write 권한 (최 상위 권한, 내부 권한이 존재할 수 있음)
  * event : 모듈에서 발생한 이벤트
  *
@@ -59,6 +59,9 @@ function newSaram() {
     this.weld = saramWeld;
     this.addReceiver = saramAddReceiver;
 
+    this.db = null; //차후 Mraz 연동
+    this.generateUUID = null; //차후 UUID 생성 개발 (snowflake)
+
     this.call = {
         get:function(path, query, callback){
             serverRequest(this, 'GET', path, query, null, callback);
@@ -99,6 +102,10 @@ function saramLoadModule(moduleContent) {
     }
 
     this.moduleContents[name] = moduleContent;
+
+    if(typeof(moduleContent.load)=="function") {
+        moduleContent.load(this, moduleContent);
+    }
 }
 
 /**
@@ -141,7 +148,7 @@ function saramUseModule(moduleName, mid, obj) {
     settingModuleBundle(this, moduleObject);
 
     if(typeof(moduleContent.init)=="function") {
-        moduleContent.init(moduleObject.obj, obj);
+        moduleContent.init(this, moduleObject.obj, obj);
     }
 }
 
