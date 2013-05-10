@@ -9,7 +9,7 @@
 module.exports = function() {
     this.weldList = {}; //name 기준
 
-    this.weldedBundle = []; //URL 기준
+    this.weldedBundle = {}; //URL 기준
     this.get = [];
     this.post = [];
     this.put = [];
@@ -81,6 +81,12 @@ module.exports = function() {
 
             return {found:true, pipeline:[{pipe:pipe, match:match, moduleContent:this.moduleContent, moduleObject:this.moduleObject}]};
         }
+
+        //메인이면 우선 찾았다고 보고
+        if(path=="/") {
+            return {found:true, pipeline:[{pipe:{type:"GET", url:"/", redirect:"/main.view"}, moduleContent:this.moduleContent, moduleObject:this.moduleObject}]};
+        }
+
         return {found:false};
     }
 }

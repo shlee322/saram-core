@@ -35,22 +35,26 @@
  */
 
 var http = require('http');
-var url = require('url');
+var snowflake = require('snowflake-node');
+var path = require('path');
 var bundle = require('./module/bundle.js');
+var db = require('./db/index.js');
 var context = require('./context.js');
+var call = require('./call.js');
+var request = require('./request.js');
 
 /**
  * 새로운 Saram 객체를 생성하여 반환합니다.
  * @returns {newSaram} 생성된 Saram 객체
  */
-module.exports = function() {
-    return new newSaram();
+module.exports = function(op) {
+    return new newSaram(op);
 }
 
 /**
  * Saram 객체 생성 함수
  */
-function newSaram() {
+function newSaram(op) {
     this.load = saramLoadModule;
     this.use = saramUseModule;
     this.start = saramStartServer;
@@ -59,21 +63,26 @@ function newSaram() {
     this.weld = saramWeld;
     this.addReceiver = saramAddReceiver;
 
-    this.db = null; //차후 Mraz 연동
-    this.generateUUID = null; //차후 UUID 생성 개발 (snowflake)
+    this.db = db(); //차후 Mraz 연동
+    this.cache = null;
+
+    var snow = new snowflake.snowflake;
+    this.generateUID = function (cb) {
+        cb(snow.generate());
+    }
 
     this.call = {
         get:function(path, query, callback){
-            serverRequest(this, 'GET', path, query, null, callback);
+            request.serverRequest(this, 'GET', path, query, null, callback);
         },
         post:function(path, query, data, callback){
-            serverRequest(this, 'POST', path, query, data, callback);
+            request.serverRequest(this, 'POST', path, query, data, callback);
         },
         put:function(path, query, data, callback){
-            serverRequest(this, 'PUT', path, query, data, callback);
+            request.serverRequest(this, 'PUT', path, query, data, callback);
         },
         delete:function(path, query, data, callback){
-            serverRequest(this, 'DELETE', path, query, data, callback);
+            request.serverRequest(this, 'DELETE', path, query, data, callback);
         }
     };
 
@@ -84,6 +93,18 @@ function newSaram() {
     var rootPipe = {type:"WELD", name:"root", url:"/", action:"root"};
     initPipe(this, rootPipe);
     this.pipeBundle.addPipe(rootPipe);
+
+
+    //스태틱 로드
+    this.load(require('./modules/static/'));
+
+    //매니저 로드
+    this.load(require('./modules/manager/'));
+    this.use('elab.manager', 'elab.manager');
+    //매니저에서 관리할 모듈 디렉토리 추가
+    this.getModuleObjectByMid('elab.manager').callAction('addModulesDir', {dir:path.resolve(__dirname, 'modules/')},{});
+    //웹 매니저 페이지 활성화
+    this.weld('elab.manager', 'admin');
 }
 
 /**
@@ -140,8 +161,12 @@ function saramUseModule(moduleName, mid, obj) {
     moduleObject.getMid = function() {
         return mid;
     }
+    //DirectRequest
+    moduleObject.callAction = function(action, query, data, callback) {
+        request.directRequest(this, moduleContent, moduleObject, action, query, data, callback);
+    }
 
-    moduleObject.obj = {getModuleName:moduleObject.getModuleName, getMid:moduleObject.getMid};
+    moduleObject.obj = {getModuleName:moduleObject.getModuleName, getMid:moduleObject.getMid, callAction:moduleObject.callAction};
 
     this.moduleObjects[mid] = moduleObject;
 
@@ -167,7 +192,7 @@ function saramStartServer(port) {
     var saram = this;
 
     var req = function(req, res) {
-        httpRequest(saram, req, res);
+        request.httpRequest(saram, req, res);
     };
 
     http.createServer(req).listen(port);
@@ -346,154 +371,4 @@ function settingModuleBundle(saram, moduleObject) {
     for(var i in pipes) {
         moduleObject.pipeBundle.addPipe(pipes[i]);
     }
-}
-
-/**
- * Http 요청을 처리하는 함수
- * @param saram Saram 객체
- * @param req node.js HTTP Request Object
- * @param res node.js HTTP Response Object
- */
-function httpRequest(saram, req, res) {
-    var method = req.method.toLowerCase();
-    if(method != "get" && method != "post" && method != "put" && method != "delete") {
-        return;
-    }
-    req.sender = {type:"http"};
-    req.url = url.parse(req.url, true);
-    req.query = req.url.query;
-    req.path = req.url.pathname;
-
-    var pipeline = saram.pipeBundle.getPipeline(req.method, req.path);
-    //404 Error
-    if(!pipeline.found) {
-        res.writeHead(404);
-        res.end("elab.saram.core.error.page.notfound");
-        return;
-    }
-
-    var ctx = new context(saram, req, res, pipeline);
-    request(saram, ctx);
-}
-
-/**
- * Server 요청을 처리하는 함수
- * @param saram Saram 객체
- * @param method 요청 메소드
- * @param path 요청 경로
- * @param query 요청 쿼리
- * @param data 요청 데이터
- * @param callback 콜백 함수
- */
-function serverRequest(saram, method, path, query, data, callback) {
-    var req = {};
-    req.sender = {type:"server", name:"local"};
-    req.method = method;
-    req.query = query;
-    req.path = path;
-    req.data = data;
-
-    var pipeline = saram.pipeBundle.getPipeline(req.method, req.path);
-    //404 Error
-    if(!pipeline.found) {
-        callback(null);
-        return;
-    }
-
-    var ctx = new context(saram, req, res, pipeline);
-    request(saram, ctx);
-}
-
-/**
- * 각 요청을 처리하는 함수
- * @param saram Saram 객체
- * @param ctx Context
- * @returns {*}
- */
-function request(saram, ctx) {
-    var nowPipe = ctx.pipeline.pipeline.shift();
-    if(!nowPipe) {
-        return;
-    }
-
-    if(!nowPipe.moduleObject) {
-        return request(saram, ctx);
-    }
-
-    ctx.mObj = nowPipe.moduleObject.obj;
-    var actionName = nowPipe.pipe.action;
-
-    //파라미터
-    ctx.req.param = {};
-    for(var index in nowPipe.match) {
-        var index = Number(index);
-        if(!index || index == NaN || index == 0) {
-            continue;
-        }
-        ctx.req.param[nowPipe.pipe.rawPath.param[index-1]] = nowPipe.match[index];
-    }
-
-    callAction(nowPipe.moduleContent, nowPipe.moduleObject, actionName, ctx, function(){request(saram, ctx);});
-}
-
-/**
- * 이벤트를 호출하는 함수
- * 이 함수가 호출되면 리시버에게 이벤트가 호출됬다는 것을 알림
- * @param moduleObject 모듈 오브젝트
- * @param event 이벤트 이름
- * @param ctx Context
- * @param callback 콜백 함수
- */
-function callEvent(moduleObject, event, ctx, callback) {
-    var receiverList = moduleObject.event[event];
-    if(!receiverList) {
-        callback();
-        return;
-    }
-
-    callReceiver(receiverList.slice(0), ctx, callback);
-}
-
-/**
- * 이벤트 리시버를 호출하는 함수
- * 재귀함수로 동작하며 매 호출 시 리시버 리스트에서 한개씩 꺼내서 리시버를 동작시킨다.
- * @param receiverList 호출할 리시버 리스트
- * @param ctx Context
- * @param callback 콜백 함수
- */
-function callReceiver(receiverList, ctx, callback) {
-    var receiver = receiverList.shift();
-    if(!receiver) {
-        callback();
-        return;
-    }
-
-    callAction(receiver.receiverContent, receiver.receiverObject, receiver.action, ctx, function(){
-        callReceiver(receiverList, ctx, callback);
-    });
-}
-
-/**
- * 모듈 Action 호출 함수
- *
- * @param moduleContent Module Content
- * @param moduleObject Module Object
- * @param actionName Action Name
- * @param ctx Context
- * @param step Call Next Step Function
- */
-function callAction(moduleContent, moduleObject, actionName, ctx, step) {
-    callEvent(moduleObject, "call." + actionName +".before", ctx, function() {
-        var newStep = function() {
-            callEvent(moduleObject, "call." + actionName +".after", ctx, function() {
-                step();
-            });
-        }
-
-        var actionFunc = moduleContent.actions[actionName];
-        if(!actionFunc || typeof(actionFunc(ctx, newStep)) == "undefined") {
-            newStep();
-        }
-    });
-
 }

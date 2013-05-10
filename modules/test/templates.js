@@ -1,3 +1,10 @@
+var path = require('path');
+
 module.exports = {
-    testpipe:{file:"test.jade"}
+    dir:path.resolve(__dirname, 'templates/'),
+    actions:{
+        get_test:{
+            file:"test.jade"
+        }
+    }
 }

@@ -5,6 +5,9 @@
   "private": true,
   "dependencies": {
       "xxhash": "0.1.1",
-      "request": "2.16.2"
+      "request": "2.16.2",
+      "snowflake-node": "0.1.0",
+      "jade": "0.30.0",
+      "ejs": "0.8.4"
   }
 }
