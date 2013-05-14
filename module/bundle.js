@@ -104,9 +104,10 @@ function getPipeObject(bundleObject, type) {
         if(type.toLowerCase() == 'weld') {
             return bundleObject.weldList;
         }
+        return bundleObject.get;
     }
 
-    return bundleObject.get;
+    return pipeObject;
 }
 
 /**
@@ -152,7 +153,7 @@ function getWeldedBundlePipeline(bundleObject, pipeType, path) {
         }
 
         var matchString = match[0];
-        var childString = path.substring(match.length);
+        var childString = path.substring(matchString.length); //bug!
 
         var bundles = weldedBundle.bundles;
         for(var weldPath in bundles) {

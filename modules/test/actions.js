@@ -3,6 +3,7 @@ module.exports = {
         console.log("testpipe");
     },
     index : function (ctx, step) {
+        console.log(ctx.auth);
         console.log("index");
         ctx.res.send({test:'index'});
     },

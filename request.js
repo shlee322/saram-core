@@ -1,4 +1,5 @@
 var url = require('url');
+var querystring = require('querystring');
 var response = require('./response.js');
 var call = require('./call.js');
 var context = require('./context.js');
@@ -26,6 +27,7 @@ function httpRequest(saram, req, res) {
     req.query = req.url.query;
     req.path = req.url.pathname;
     req.type = "data";
+    req.body = "";
 
     var path = req.path;
     if(path.match(/.view$/)) {
@@ -59,7 +61,16 @@ function httpRequest(saram, req, res) {
         return;
     }
 
-    request(saram, ctx);
+    //차후 용량 체크등등
+    req.on('data', function (chunk) {
+        req.body += chunk;
+    });
+
+    req.on('end', function () {
+        //차후 막 종류에 따라 하던지..
+        req.body = querystring.parse(req.body);
+        request(saram, ctx);
+    });
 }
 
 /**
@@ -77,7 +88,16 @@ function serverRequest(saram, method, path, query, data, callback) {
     req.method = method;
     req.query = query;
     req.path = path;
-    req.data = data;
+    req.body = data;
+    if(!req.method) {
+        req.method = "GET";
+    }
+    if(!req.query) {
+        req.query = {};
+    }
+    if(!req.body) {
+        req.body = {};
+    }
 
     var pipeline = saram.pipeBundle.getPipeline(req.method, req.path);
     //404 Error
@@ -87,7 +107,7 @@ function serverRequest(saram, method, path, query, data, callback) {
     }
 
     var ctx = new context(saram, req, pipeline);
-    //setServerResponse(ctx, res);
+    response.setServerResponse(ctx, callback);
     request(saram, ctx);
 }
 
@@ -134,10 +154,14 @@ function request(saram, ctx) {
     //파라미터
     ctx.req.param = {};
     for(var index in nowPipe.match) {
-        var index = Number(index);
-        if(!index || index == NaN || index == 0) {
+        if(!index.match(/^[0-9]+$/)) {
             continue;
         }
+        var index = Number(index);
+        if(index == 0) {
+            continue;
+        }
+
         ctx.req.param[nowPipe.pipe.rawPath.param[index-1]] = nowPipe.match[index];
     }
 

@@ -1,14 +1,17 @@
 var snowflake = require('snowflake-node');
 var url = require('url');
+var XXHash = require('xxhash');
+
 
 module.exports = function(saram) {
-    return new newDB(saram);
+    return new newCache(saram);
 }
 
-function newDB(saram) {
+function newCache(saram) {
     this.saram = saram;
     this.addNode = addNode;
-    this.query = temp_query;
+    this.set = set;
+    this.get = get;
 
     this.cluster = {};
 }
@@ -62,26 +65,22 @@ function addNode(nodeUrlStr, clusterName) {
     this.cluster[clusterName].push(connecter);
 }
 
-function temp_query(sharedKey, func, clusterName) {
+function set(key, value, cb, clusterName) {
     if(!clusterName) {
         clusterName = 'default';
     }
 
     var cluster = this.cluster[clusterName];
+    var hash = XXHash.hash(new Buffer(key), 0x654C6162);
+    cluster[hash%cluster.length].set(key, value, cb);
+}
 
-    if(sharedKey) {
-        this.saram.sharding(sharedKey, cluster.length, function(node) {
-            func(cluster[node]);
-        });
-    } else {
-        for(var node in cluster) {
-            func(cluster[node]);
-        }
+function get(key, cb, clusterName) {
+    if(!clusterName) {
+        clusterName = 'default';
     }
-}
 
-function addQuery(queryName, func) {
-}
-
-function execute(queryName, obj) {
+    var cluster = this.cluster[clusterName];
+    var hash = XXHash.hash(new Buffer(key), 0x654C6162);
+    cluster[hash%cluster.length].get(key, cb);
 }

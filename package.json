@@ -6,8 +6,11 @@
   "dependencies": {
       "xxhash": "0.1.1",
       "request": "2.16.2",
-      "snowflake-node": "0.1.0",
+      "snowflake-node": "0.2.0",
       "jade": "0.30.0",
-      "ejs": "0.8.4"
+      "ejs": "0.8.4",
+      "mysql": "2.0.0-alpha8",
+      "memory-store": "0.0.1",
+      "node_hash": "0.2.0"
   }
 }

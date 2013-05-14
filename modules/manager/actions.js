@@ -38,7 +38,6 @@ module.exports = {
     get_weld_info:function(ctx, next) {
         var mod = ctx.saram.getModuleObjectByMid(ctx.req.param.mid);
         var test = generateWeldTree(ctx.saram.pipeBundle);
-
     },
     addModulesDir:function(ctx, next) {
         var dir = ctx.req.query.dir;

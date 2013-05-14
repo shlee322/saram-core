@@ -39,6 +39,7 @@ var snowflake = require('snowflake-node');
 var path = require('path');
 var bundle = require('./module/bundle.js');
 var db = require('./db/index.js');
+var cache = require('./cache/index.js');
 var context = require('./context.js');
 var call = require('./call.js');
 var request = require('./request.js');
@@ -55,6 +56,8 @@ module.exports = function(op) {
  * Saram 객체 생성 함수
  */
 function newSaram(op) {
+    var saram = this;
+
     this.load = saramLoadModule;
     this.use = saramUseModule;
     this.start = saramStartServer;
@@ -63,36 +66,51 @@ function newSaram(op) {
     this.weld = saramWeld;
     this.addReceiver = saramAddReceiver;
 
-    this.db = db(); //차후 Mraz 연동
-    this.cache = null;
+    this.db = db(this);
+    this.cache = cache(this);
 
     var snow = new snowflake.snowflake;
     this.generateUID = function (cb) {
         cb(snow.generate());
     }
+    this.sharding = function (uid, len, cb) {
+        cb(snow.sharding(uid, len));
+    }
 
     this.call = {
         get:function(path, query, callback){
-            request.serverRequest(this, 'GET', path, query, null, callback);
+            request.serverRequest(saram, 'GET', path, query, null, callback);
         },
         post:function(path, query, data, callback){
-            request.serverRequest(this, 'POST', path, query, data, callback);
+            request.serverRequest(saram, 'POST', path, query, data, callback);
         },
         put:function(path, query, data, callback){
-            request.serverRequest(this, 'PUT', path, query, data, callback);
+            request.serverRequest(saram, 'PUT', path, query, data, callback);
         },
         delete:function(path, query, data, callback){
-            request.serverRequest(this, 'DELETE', path, query, data, callback);
+            request.serverRequest(saram, 'DELETE', path, query, data, callback);
         }
     };
 
     this.moduleContents = {};
     this.moduleObjects = {};
-    this.pipeBundle = new bundle();
+    //moduleObject
+    this.rootModuleContent = {
+        actions:{
+            root:function(ctx, next) {}
+        }
+    };
+    this.rootModuleObject = {};
+    this.rootModuleObject.event = {};
+    this.rootModuleObject.pipeBundle = new bundle();
+    this.rootModuleObject.pipeBundle.moduleContent = this.rootModuleContent;
+    this.rootModuleObject.pipeBundle.moduleObject = this.rootModuleObject;
 
     var rootPipe = {type:"WELD", name:"root", url:"/", action:"root"};
     initPipe(this, rootPipe);
-    this.pipeBundle.addPipe(rootPipe);
+    this.rootModuleObject.pipeBundle.addPipe(rootPipe);
+
+    this.pipeBundle = this.rootModuleObject.pipeBundle;
 
 
     //스태틱 로드
@@ -262,6 +280,9 @@ function saramWeld(parentMid, childMid, path, weld) {
  */
 function saramAddReceiver(targetMid, eventName, receiverMid, action) {
     var targetObject = this.getModuleObjectByMid(targetMid);
+    if(!targetMid) { //루트
+        targetObject = this.rootModuleObject;
+    }
     var receiverObject = this.getModuleObjectByMid(receiverMid);
     var receiverContent = this.getModuleContentByName(receiverObject.getModuleName());
 
@@ -310,7 +331,7 @@ function weldRoutine(saram, parentMid, childMid, path, weld) {
     if(parentObject) {
         parentPipeBundle = parentObject.pipeBundle;
     } else {
-        parentPipeBundle = saram.pipeBundle;
+        parentPipeBundle = saram.rootModuleObject.pipeBundle;
     }
     //일단 덮어쓰자
     /*if(bundle.getWeldedBundle(weldName, pipe)) {
@@ -343,7 +364,8 @@ function initPipe(saram, pipe) {
     while((result = reg.exec(path)) !== null) {
         pipe.rawPath.param.push(result[1]);
     }
-    pipe.rawPath.path = "^" + path.replace(reg, "/(.+)");
+
+    pipe.rawPath.path = "^" + path.replace(reg, "/([^/]+)");
 
     if(pipe.type.toLowerCase() != 'weld') {
         pipe.rawPath.path = pipe.rawPath.path + "$";

@@ -2,7 +2,8 @@ var path = require('path');
 var fs = require('fs');
 
 module.exports = {
-    setHttpResponse: setHttpResponse
+    setHttpResponse: setHttpResponse,
+    setServerResponse: setServerResponse
 };
 
 function setHttpResponse(ctx, res) {
@@ -12,7 +13,7 @@ function setHttpResponse(ctx, res) {
     response.raw.obj = res;
 
     response.info = function (obj) {
-        res.writeHead(200);
+        res.writeHead(200, {"Content-Type": "application/json"});
         res.end(JSON.stringify(obj));
     };
 
@@ -52,6 +53,31 @@ function setHttpResponse(ctx, res) {
             }
         };
     }
+
+    response.error = function (error, code) {
+        if(!code) {
+            code = 500;
+        }
+
+        response.info({error:error});
+
+        //에러 처리
+    };
+
+    ctx.setResponse(response);
+}
+
+function setServerResponse(ctx, callback) {
+    var response = {};
+    response.raw = {};
+    response.raw.type = "server";
+    response.raw.obj = callback;
+
+    response.info = function (obj) {
+        callback(obj);
+    };
+
+    response.send = response.info;
 
     response.error = function (error, code) {
         if(!code) {

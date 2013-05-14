@@ -4,6 +4,6 @@
 */
 
 module.exports = [
-    {type:"WELD", name:"root", url:"/:uuid/", action:"uuidWeld"},
+    {type:"POST", url:"/signup", action:"signup"},
     {type:"POST", url:"/signin", action:"signin"}
 ];
