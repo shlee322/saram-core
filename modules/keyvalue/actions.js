@@ -1,6 +1,42 @@
 var XXHash = require('xxhash');
 
 module.exports = {
+    getWeld : function (ctx, step) {
+        var table = ctx.current.module.name;
+        var dataParam = ctx.current.module.param;
+
+        var hash = ctx.current.module.getMid();
+        for(var i in dataParam) {
+            hash += dataParam[i][0] + dataParam[i][1];
+        }
+        if(ctx.current.module.list) {
+            hash += "key" + ctx.req.param.key;
+        }
+        hash = XXHash.hash(new Buffer(hash), 0x654C6162).toString(16);
+
+        ctx.saram.db.query(hash, function (db) {
+            var where = "";
+            var data = [];
+            for(var i in dataParam) {
+                where += "`" + dataParam[i][0] + "_" + dataParam[i][1] + "`=0x" + ctx.param.get(dataParam[i][0], dataParam[i][1]) + " and ";
+            }
+            where += "`key`=?";
+            data.push(XXHash.hash(new Buffer(ctx.req.param.key), 0x654C6162));
+
+            db.query("SELECT hex(`uid`) AS `uid`, `value` FROM `" + table + "` WHERE " + where, data, function(err, rows) {
+                if(err) {
+                    throw err;
+                }
+                if(rows.length < 1)  {
+                    ctx.res.error("key error");
+                } else {
+                    ctx.param.set(ctx.current.module.getMid(), "key", rows[0].uid.toString());
+                    step();
+                }
+            });
+        });
+        return null;
+    },
     get : function (ctx, step) {
         var table = ctx.current.module.name;
         var dataParam = ctx.current.module.param;
@@ -70,7 +106,7 @@ module.exports = {
                         throw err;
                         ctx.res.send({state:"ERROR"});
                     } else {
-                        ctx.res.send({state:"OK"});
+                        ctx.res.send({state:"OK", uid:uid});
                     }
 
                     step();

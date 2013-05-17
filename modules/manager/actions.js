@@ -1,35 +1,8 @@
 var path = require('path');
 var fs = require('fs');
 
-module.exports = {
+var actions = {
     main:function(ctx, next) {
-        ctx.res.send({});
-    },
-    modules_main:function(ctx, next) {
-        var obj = {};
-        obj.moduleInfos = [];
-        obj.midList = [];
-
-        var info = ctx.current.module.moduleInfos;
-        for(var name in info) {
-            var mod = {};
-            mod.name = name;
-            mod.path = path.resolve(__dirname, info[name].path);
-            mod.info = info[name].info.info;
-            if(!mod.info) {
-                mod.info = {name:"", description:""};
-            }
-            obj.moduleInfos.push(mod);
-        }
-
-        for(var mid in ctx.saram.moduleObjects) {
-            obj.midList.push(mid);
-        }
-
-        ctx.res.send(obj);
-    },
-    module_page:function(ctx, next) {
-        var mod = ctx.saram.getModuleObjectByMid(ctx.req.param.mid);
         ctx.res.send({});
     },
     weld_main:function(ctx, next) {
@@ -60,6 +33,10 @@ module.exports = {
         return false;
     }
 };
+
+require('./modules/actions.js')(actions);
+
+module.exports = actions;
 
 function getModuleInfo(path) {
     if(path == "index.js") {

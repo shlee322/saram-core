@@ -67,5 +67,75 @@ module.exports = {
         });
 
         return null;
+    },
+    get : function (ctx, step) {
+        var table = ctx.current.module.name;
+        var dataParam = ctx.current.module.param;
+
+        var hash = ctx.current.module.getMid();
+        for(var i in dataParam) {
+            hash += dataParam[i][0] + dataParam[i][1];
+        }
+        hash = XXHash.hash(new Buffer(hash), 0x654C6162).toString(16);
+
+        ctx.saram.db.query(hash, function (db) {
+            var where = "WHERE `uid`=0x" + ctx.req.param.uid + " and ";
+            for(var i in dataParam) {
+                where += "`" + dataParam[i][0] + "_" + dataParam[i][1] + "`=0x" + ctx.param.get(dataParam[i][0], dataParam[i][1]) + " and ";
+            }
+            where = where.substring(0, where.length - 5);
+            if(where.length == 6) {
+                where = "";
+            }
+
+            db.query("SELECT hex(`uid`) AS `uid`, `value` FROM `" + table + "` " + where, [], function(err, rows) {
+                if(err) {
+                    ctx.res.send({state:"ERROR"});
+                    return;
+                }
+                if(rows.length < 1) {
+                    ctx.res.error('error');
+                    return;
+                }
+                ctx.res.send(rows[0]);
+                step();
+            });
+        });
+        return null;
+    },
+    getWeld : function (ctx, step) {
+        var table = ctx.current.module.name;
+        var dataParam = ctx.current.module.param;
+
+        var hash = ctx.current.module.getMid();
+        for(var i in dataParam) {
+            hash += dataParam[i][0] + dataParam[i][1];
+        }
+        hash = XXHash.hash(new Buffer(hash), 0x654C6162).toString(16);
+
+        ctx.saram.db.query(hash, function (db) {
+            var where = "WHERE `uid`=0x" + ctx.req.param.uid + " and ";
+            for(var i in dataParam) {
+                where += "`" + dataParam[i][0] + "_" + dataParam[i][1] + "`=0x" + ctx.param.get(dataParam[i][0], dataParam[i][1]) + " and ";
+            }
+            where = where.substring(0, where.length - 5);
+            if(where.length == 6) {
+                where = "";
+            }
+
+            db.query("SELECT hex(`uid`) AS `uid`, `value` FROM `" + table + "` " + where, [], function(err, rows) {
+                if(err) {
+                    ctx.res.send({state:"ERROR"});
+                    return;
+                }
+                if(rows.length < 1) {
+                    ctx.res.error('error');
+                    return;
+                }
+                ctx.param.set(ctx.current.module.getMid(), "uid", rows[0].uid.toString());
+                step();
+            });
+        });
+        return null;
     }
 };

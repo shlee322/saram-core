@@ -63,7 +63,7 @@
                 var mid = midList[i];
         %>
         <li>
-            <a href="./<%=mid%>/main.view"><i class="icon-chevron-right"></i> <%=mid%></a>
+            <a href="./info/<%=mid%>/main.view"><i class="icon-chevron-right"></i> <%=mid%></a>
         </li>
         <% } %>
     </ul>
@@ -114,7 +114,7 @@
                         <td><%=module.name%></td>
                         <td><%=module.info.name%></td>
                         <td><span class="badge">Site</span> <%=module.info.description%></td>
-                        <td><span class="badge badge-success">Create</span></td>
+                        <td><a onclick="callCreateWindow('<%=module.name%>')"  data-toggle="modal" class="badge badge-success">Create</a></td>
                     </tr>
                     <% } %>
 
@@ -131,6 +131,29 @@
 <footer>
     <p>&copy; Lee Sanghyuck (http://profile.elab.kr)</p>
 </footer>
+
+<!-- Modal -->
+<div id="createWindow" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel">Create Module - </h3>
+    </div>
+    <div class="modal-body">
+        <div class="row-fluid">
+            <iframe id="createWindowContent" class="span12" style="min-height: 300px" src=""></iframe>
+        </div>
+        <form id="createForm" name="form" method="POST" action="./create" style="display:none">
+            <input type="text" id="createFormModule" name="module">
+            <input type="text" id="createFormMid" name="mid">
+            <input type="submit">
+        </form>
+    </div>
+    <div class="modal-footer">
+        <input type="text" id="inputMid" placeholder="Mid">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+        <button id="nextButton" onclick="callCreateWindowNextButton()" class="btn btn-primary">Next</button>
+    </div>
+</div>
 </div>
 <!--/.fluid-container-->
 <script src="http://vinceg.github.io/Bootstrap-Admin-Theme/vendors/jquery-1.9.1.min.js"></script>
@@ -138,10 +161,28 @@
 <script src="http://vinceg.github.io/Bootstrap-Admin-Theme/vendors/easypiechart/jquery.easy-pie-chart.js"></script>
 <script src="http://vinceg.github.io/Bootstrap-Admin-Theme/assets/scripts.js"></script>
 <script>
-    $(function() {
-        // Easy pie charts
-        $('.chart').easyPieChart({animate: 1000});
-    });
+    function callCreateWindow(name) {
+        $('#myModalLabel').html('Create Module - ' + name);
+        $('#createWindow').modal();
+        $('#createWindowContent').attr('src', 'http://naver.com');
+        $('#nextButton').html('Next');
+        $('#inputMid').show();
+        $('#inputMid').val('');
+        $('#createFormModule').val(name);
+    }
+
+    function callCreateWindowNextButton() {
+        if($('#nextButton').html() == 'Agree') {
+            $('#createForm').submit();
+            //createForm
+            return;
+        }
+        $('#createFormMid').val($('#inputMid').val());
+        $('#createWindowContent').attr('src', 'http://www.gnu.org/licenses/lgpl-2.1.txt');
+        $('#nextButton').html('Agree');
+        $('#inputMid').hide();
+
+    }
 </script>
 </body>
 
