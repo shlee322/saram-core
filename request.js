@@ -129,7 +129,9 @@ function directRequest(saram, moduleContent, moduleObject, actionName, query, da
 
     var ctx = new context(saram, req, []);
 
-    call.callAction(moduleContent, moduleObject, actionName, ctx, function(){}); //차후 콜백처리
+    ctx.run(function(){
+        call.callAction(moduleContent, moduleObject, actionName, ctx, function(){}); //차후 콜백처리
+    });
 }
 
 /**
@@ -165,5 +167,7 @@ function request(saram, ctx) {
         ctx.req.param[nowPipe.pipe.rawPath.param[index-1]] = nowPipe.match[index];
     }
 
-    call.callAction(nowPipe.moduleContent, nowPipe.moduleObject, actionName, ctx, function(){request(saram, ctx);});
+    ctx.run(function(){
+        call.callAction(nowPipe.moduleContent, nowPipe.moduleObject, actionName, ctx, function(){request(saram, ctx);});
+    });
 }

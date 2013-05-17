@@ -49,6 +49,11 @@ var request = require('./request.js');
  * @returns {newSaram} 생성된 Saram 객체
  */
 module.exports = function(op) {
+    if(!op) {
+        op = {
+            useManager : true
+        };
+    }
     return new newSaram(op);
 }
 
@@ -122,7 +127,9 @@ function newSaram(op) {
     //매니저에서 관리할 모듈 디렉토리 추가
     this.getModuleObjectByMid('elab.manager').callAction('addModulesDir', {dir:path.resolve(__dirname, 'modules/')},{});
     //웹 매니저 페이지 활성화
-    this.weld('elab.manager', 'admin');
+    if(op.useManager) {
+        this.weld('elab.manager', 'admin');
+    }
 }
 
 /**

@@ -8,6 +8,11 @@ module.exports = function(saram, req, pipeline) {
     this.res = {};
     this.pipeline = pipeline;
 
+    this.domain = domain.create();
+    this.domain.on('error', function(er) {
+        _this.res.error('elab.saram.core.error.uncaughtException', {message:er.message, stack:er.stack});
+    });
+
     //HEX값만
     this.param = {
         _data : {},
@@ -37,5 +42,9 @@ module.exports = function(saram, req, pipeline) {
 
     this.setResponse = function (res) {
         this.res = res;
+    }
+
+    this.run = function(func) {
+        this.domain.run(func);
     }
 }

@@ -54,14 +54,18 @@ function setHttpResponse(ctx, res) {
         };
     }
 
-    response.error = function (error, code) {
+    response.error = function (name, obj, code) {
         if(!code) {
             code = 500;
         }
 
-        response.info({error:error});
+        response.info({
+                error:{
+                    code:name,
+                    obj:obj
+                }
+            });
 
-        //에러 처리
     };
 
     ctx.setResponse(response);
