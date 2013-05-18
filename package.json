@@ -4,9 +4,9 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
-      "xxhash": "0.1.1",
+      "xxhash": "0.1.3",
       "request": "2.16.2",
-      "snowflake-node": "0.2.0",
+      "snowflake-node": "0.2.1",
       "jade": "0.30.0",
       "ejs": "0.8.4",
       "mysql": "2.0.0-alpha8",
