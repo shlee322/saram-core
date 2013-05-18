@@ -43,6 +43,7 @@ var cache = require('./cache/index.js');
 var context = require('./context.js');
 var call = require('./call.js');
 var request = require('./request.js');
+var custom = require('./custom.js');
 
 /**
  * 새로운 Saram 객체를 생성하여 반환합니다.
@@ -117,18 +118,20 @@ function newSaram(op) {
 
     this.pipeBundle = this.rootModuleObject.pipeBundle;
 
+    //스태틱 로드 - 차후 사용
+    //this.load(require('./modules/static/'));
 
-    //스태틱 로드
-    this.load(require('./modules/static/'));
+    //커스텀 로드
+    this.custom = new custom(this);
 
     //매니저 로드
     this.load(require('./modules/manager/'));
-    this.use('elab.manager', 'elab.manager');
+    this.use('elab.manager', 'core.manager');
     //매니저에서 관리할 모듈 디렉토리 추가
-    this.getModuleObjectByMid('elab.manager').callAction('addModulesDir', {dir:path.resolve(__dirname, 'modules/')},{});
+    this.getModuleObjectByMid('core.manager').callAction('addModulesDir', {dir:path.resolve(__dirname, 'modules/')},{});
     //웹 매니저 페이지 활성화
     if(op.useManager) {
-        this.weld('elab.manager', 'admin');
+        this.weld('core.manager', 'admin');
     }
 }
 
