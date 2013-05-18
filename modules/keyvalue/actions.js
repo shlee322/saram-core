@@ -28,7 +28,7 @@ module.exports = {
                     throw err;
                 }
                 if(rows.length < 1)  {
-                    ctx.res.error("key error");
+                    throw ctx.current.module.error('key.notfound');
                 } else {
                     ctx.param.set(ctx.current.module.getMid(), "key", rows[0].uid.toString());
                     step();
@@ -64,7 +64,7 @@ module.exports = {
                     throw err;
                 }
                 if(rows.length < 1)  {
-                    ctx.res.send({uid:null, value:null});
+                    throw ctx.current.module.error('key.notfound');
                 } else {
                     ctx.res.send({uid:rows[0].uid.toString(),  value:rows[0].value});
                 }
@@ -104,7 +104,6 @@ module.exports = {
                 db.query(query, values, function(err, rows) {
                     if(err) {
                         throw err;
-                        ctx.res.send({state:"ERROR"});
                     } else {
                         ctx.res.send({state:"OK", uid:uid});
                     }

@@ -4,22 +4,18 @@ module.exports = {
         if(uuid == "my") {
             uuid = ctx.auth;
         }
-        if(!uuid) {
-            ctx.res.send({error:true});
-            return null;
+        if(!uuid.match(/^[0-9A-Fa-f]+$/)) {
+            uuid = null;
         }
-
-        //유저가 다르면 write 제약
-        if(uuid!=ctx.auth) {
-            ctx.perm.write = false;
+        if(!uuid) {
+            throw ctx.current.module.error('weld.notuuid');
         }
 
         ctx.param.set(ctx.current.module.getMid(), "uuid", uuid);
     },
     signin: function(ctx, step) {
         if(ctx.req.sender.type != "server") {
-            ctx.res.error('error');
-            return null;
+            throw ctx.current.module.error('perm.notserver');
         }
 
         var uuid = ctx.req.body.uuid;
@@ -45,8 +41,7 @@ module.exports = {
         var key = ctx.current.module.getMid() + "_token_" + ctx.req.query.access_token;
         ctx.saram.cache.get(key, function(uuid) {
             if(!uuid) {
-                ctx.res.send({error:true}); //error
-                return;
+                throw ctx.current.module.error('auth.token.expired');
             }
             ctx.auth = uuid;
             step();
@@ -56,8 +51,7 @@ module.exports = {
     },
     myonly: function(ctx, step) {
         if(ctx.param.get(ctx.current.module.getMid(), "uuid") != ctx.auth) {
-            ctx.res.error('write_error');
-            return null;
+            throw ctx.current.module.error('perm.myonly');
         }
     }
 }

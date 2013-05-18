@@ -14,7 +14,6 @@ module.exports = {
                 db.query("INSERT INTO `" + table + "`  VALUES(0x" + uid + ", ?, ?);", [id, nodeHash.sha256(pw)], function(err, rows) {
                     if(err) {
                         throw err;
-                        ctx.res.send({state:"ERROR"});
                     } else {
                         ctx.res.send({state:"OK"});
                     }
@@ -39,7 +38,7 @@ module.exports = {
                     throw err;
                 }
                 if(rows.length < 1)  {
-                    ctx.res.send({error:true});
+                    throw ctx.current.module.error('account.notfound');
                 } else {
                     ctx.saram.call.post(ctx.current.module.userPath + "/signin", null, {uuid:rows[0].uid}, function(obj) {
                         ctx.res.send(obj);

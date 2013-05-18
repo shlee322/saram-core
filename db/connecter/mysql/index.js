@@ -23,8 +23,16 @@ module.exports = function(obj) {
                 throw err;
             }
             conn.query(str, arg, function(err, rows) {
-                cb(err, rows);
+                var e = null;
+                try {
+                    cb(err, rows);
+                } catch(error) {
+                    e = error;
+                }
                 conn.end();
+                if(e) {
+                    throw e;
+                }
             });
         });
     }

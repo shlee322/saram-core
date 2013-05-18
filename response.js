@@ -11,9 +11,10 @@ function setHttpResponse(ctx, res) {
     response.raw = {};
     response.raw.type = "http";
     response.raw.obj = res;
+    response.raw.obj.responseCode = 200;
 
     response.info = function (obj) {
-        res.writeHead(200, {"Content-Type": "application/json"});
+        res.writeHead(response.raw.obj.responseCode, {"Content-Type": "application/json"});
         res.end(JSON.stringify(obj));
     };
 
@@ -48,7 +49,7 @@ function setHttpResponse(ctx, res) {
                 });
             } else {
                 var html = template.viewer(obj);
-                res.writeHead(200);
+                res.writeHead(response.raw.obj.responseCode);
                 res.end(html);
             }
         };
@@ -58,6 +59,9 @@ function setHttpResponse(ctx, res) {
         if(!code) {
             code = 500;
         }
+        if(response.raw.type == "http") {
+            response.raw.obj.responseCode = code;
+        }
 
         response.info({
                 error:{
@@ -65,7 +69,6 @@ function setHttpResponse(ctx, res) {
                     obj:obj
                 }
             });
-
     };
 
     ctx.setResponse(response);

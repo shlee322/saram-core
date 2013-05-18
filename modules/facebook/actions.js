@@ -35,7 +35,7 @@ module.exports = {
                 ctx.res.raw.obj.writeHead(200, {"Content-Type": "text/html"});
                 ctx.res.raw.obj.end("<meta http-equiv='refresh' content='0;url=" + redirectUrl + "'>");
             } else {
-                ctx.res.error('elab.facebook.notfbtoken');
+                throw ctx.current.module.error('fbtoken.notfound');
             }
             return;
         }
@@ -44,9 +44,7 @@ module.exports = {
             var obj = JSON.parse(body);
             var id = obj.id;
             if(!id) {
-                ctx.res.error('error');
-                step();
-                return;
+                throw ctx.current.module.error('fbtoken.expired');
             }
 
             var table = ctx.current.module.name;
@@ -63,7 +61,6 @@ module.exports = {
                                 db.query("INSERT INTO `" + table + "`  VALUES(0x" + uid + ", ?);", [id], function(err, rows) {
                                     if(err) {
                                         throw err;
-                                        ctx.res.send({state:"ERROR"});
                                     } else {
                                         ctx.saram.call.post(ctx.current.module.userPath + "/signin", null, {uuid:uid}, function(obj) {
                                             ctx.res.send(obj);

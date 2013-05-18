@@ -190,8 +190,17 @@ function saramUseModule(moduleName, mid, obj) {
     moduleObject.callAction = function(action, query, data, callback) {
         request.directRequest(this, moduleContent, moduleObject, action, query, data, callback);
     }
+    moduleObject.error = function(code, obj) {
+        var error = new Error();
+        error.type = "saram.error";
+        error.errorModule = moduleObject.obj;
+        error.errorCode = code;
+        error.errorMessage = moduleContent.error ? moduleContent.error[code] : "";
+        error.errorObject = obj;
+        return error;
+    }
 
-    moduleObject.obj = {getModuleName:moduleObject.getModuleName, getMid:moduleObject.getMid, callAction:moduleObject.callAction};
+    moduleObject.obj = {getModuleName:moduleObject.getModuleName, getMid:moduleObject.getMid, callAction:moduleObject.callAction, error:moduleObject.error};
 
     this.moduleObjects[mid] = moduleObject;
 

@@ -23,8 +23,7 @@ module.exports = {
 
             db.query("SELECT hex(`uid`) AS `uid`, `value` FROM `" + table + "` " + where, [], function(err, rows) {
                 if(err) {
-                    ctx.res.send({state:"ERROR"});
-                    return;
+                    throw err;
                 }
                 ctx.res.send(rows);
                 step();
@@ -56,7 +55,7 @@ module.exports = {
 
                 db.query(query, values, function(err, rows) {
                     if(err) {
-                        ctx.res.send({state:"ERROR"});
+                        throw ctx.current.module.error('error.insert');
                     } else {
                         ctx.res.send({state:"OK", uid:uid});
                     }
@@ -90,12 +89,10 @@ module.exports = {
 
             db.query("SELECT hex(`uid`) AS `uid`, `value` FROM `" + table + "` " + where, [], function(err, rows) {
                 if(err) {
-                    ctx.res.send({state:"ERROR"});
-                    return;
+                    throw err;
                 }
                 if(rows.length < 1) {
-                    ctx.res.error('error');
-                    return;
+                    throw ctx.current.module.error('uid.notfound');
                 }
                 ctx.res.send(rows[0]);
                 step();
@@ -125,12 +122,10 @@ module.exports = {
 
             db.query("SELECT hex(`uid`) AS `uid`, `value` FROM `" + table + "` " + where, [], function(err, rows) {
                 if(err) {
-                    ctx.res.send({state:"ERROR"});
-                    return;
+                    throw err;
                 }
                 if(rows.length < 1) {
-                    ctx.res.error('error');
-                    return;
+                    throw ctx.current.module.error('uid.notfound');
                 }
                 ctx.param.set(ctx.current.module.getMid(), "uid", rows[0].uid.toString());
                 step();
