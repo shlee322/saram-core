@@ -13,6 +13,42 @@ module.exports = function(obj) {
         database : obj.database
     });
 
+    this.get = function (ctx) {
+        if(!ctx) {
+            return this;
+        }
+
+        return {
+            query : function(str, arg, cb) {
+                if(!cb) {
+                    cb = arg;
+                    arg = null;
+                }
+                pool.getConnection(function(err, conn) {
+                    ctx.run(function() {
+                        if(err) {
+                            throw err;
+                        }
+                        conn.query(str, arg, function(err, rows) {
+                            ctx.run(function() {
+                                var e = null;
+                                try {
+                                    cb(err, rows);
+                                } catch(error) {
+                                    e = error;
+                                }
+                                conn.end();
+                                if(e) {
+                                    throw e;
+                                }
+                            });
+                        });
+                    });
+                });
+            }
+        }
+    };
+
     this.query = function(str, arg, cb) {
         if(!cb) {
             cb = arg;

@@ -52,4 +52,10 @@ module.exports = function(saram, req, pipeline) {
     this.run = function(func) {
         this.domain.run(func);
     }
+
+    this.db = {
+        query : function (hash, func, clusterName) {
+            return saram.db.query(hash, func, clusterName, _this);
+        }
+    }
 }

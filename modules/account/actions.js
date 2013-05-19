@@ -10,7 +10,7 @@ module.exports = {
         var hash = XXHash.hash(new Buffer(id), 0x654C6162).toString(16);
 
         ctx.saram.generateUID(function (uid) {
-            ctx.saram.db.query(hash, function (db) {
+            ctx.db.query(hash, function (db) {
                 db.query("INSERT INTO `" + table + "`  VALUES(0x" + uid + ", ?, ?);", [id, nodeHash.sha256(pw)], function(err, rows) {
                     if(err) {
                         throw err;
@@ -32,7 +32,7 @@ module.exports = {
 
         var hash = XXHash.hash(new Buffer(id), 0x654C6162).toString(16);
 
-        ctx.saram.db.query(hash, function (db) {
+        ctx.db.query(hash, function (db) {
             db.query("SELECT hex(`uid`) AS `uid` FROM `" + table + "` WHERE `id`=? and `pw`=?", [id, nodeHash.sha256(pw)], function(err, rows) {
                 if(err) {
                     throw err;

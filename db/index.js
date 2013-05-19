@@ -62,7 +62,7 @@ function addNode(nodeUrlStr, clusterName) {
     this.cluster[clusterName].push(connecter);
 }
 
-function temp_query(sharedKey, func, clusterName) {
+function temp_query(sharedKey, func, clusterName, ctx) {
     if(!clusterName) {
         clusterName = 'default';
     }
@@ -71,11 +71,11 @@ function temp_query(sharedKey, func, clusterName) {
 
     if(sharedKey) {
         this.saram.sharding(sharedKey, cluster.length, function(node) {
-            func(cluster[node]);
+            func(cluster[node].get(ctx));
         });
     } else {
         for(var node in cluster) {
-            func(cluster[node]);
+            func(cluster[node].get(ctx));
         }
     }
 }
