@@ -5,7 +5,10 @@
  */
 module.exports = {
     getName:function(){return "elab.keyvalue";},
-    init:function(saram, mod, obj) {
+    init:function(ctx) {
+        var saram = ctx.saram;
+        var mod = ctx.current.module;
+        var obj = ctx.req.body;
         mod.name = obj.name;
         mod.param = obj.param;
         mod.list = obj.list;
@@ -16,25 +19,33 @@ module.exports = {
             mod.list = false;
         }
 
-        var col = "";
-        for(var i in mod.param) {
-            col += "`" + mod.param[i][0] + "_" + mod.param[i][1] + "` BIGINT NULL ,";
-        }
+        var columns = {};
+        saram.db.utill.paramToColumns(columns, mod.param, "int64");
+        columns["key"] = "int64";
+        columns["str"] = {type:"string", length:64};
+        columns["value"] = {type:"string", length:256};
+        var index = [];
+        saram.db.utill.paramToIndexColumns(index, mod.param);
+        index.push("key");
 
-        var ind = "";
-        for(var i in mod.param) {
-            ind += "`" + mod.param[i][0] + "_" + mod.param[i][1] + "` ASC, ";
-        }
-
-        var query = "CREATE  TABLE `" + mod.name + "` (`uid` BIGINT NOT NULL , " + col + "`key` BIGINT NOT NULL, `str` VARCHAR(64) NULL, `value`  VARCHAR(256) NULL ,PRIMARY KEY (`uid`),  UNIQUE INDEX `key` (" + ind + "`key` ASC) );";
-
-        saram.db.query(null, function (db) {
-            db.query(query, function(err, rows) {
-                if(err) {
-                    console.log("ex");
-                }
-            });
+        saram.db.setTable(ctx, {
+            name : obj.name,
+            shardKey : function(nodeLength, Args) {
+                return 0;
+            },
+            columns : columns,
+            indexes : [{name:'key', type:'UNIQUE', columns:index}]
         });
+
+        mod.name = obj.name;
+        mod.param = obj.param;
+        mod.list = obj.list;
+        if(!mod.param) {
+            mod.param = [];
+        }
+        if(!mod.list) {
+            mod.list = false;
+        }
     },
     info:require('./info.js'),
     actions:require('./actions.js'),

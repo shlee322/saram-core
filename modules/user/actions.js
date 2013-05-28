@@ -53,5 +53,10 @@ module.exports = {
         if(ctx.param.get(ctx.current.module.getMid(), "uuid") != ctx.auth) {
             throw ctx.current.module.error('perm.myonly');
         }
+    },
+    useAuth: function(ctx, step) {
+        if(!ctx.req.auth) {
+            throw ctx.current.module.error('perm.notUseAuth');
+        }
     }
 }

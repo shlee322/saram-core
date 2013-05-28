@@ -1,4 +1,7 @@
-module.exports = function(saram, mod, obj) {
+module.exports = function(ctx) {
+    var saram = ctx.saram;
+    var mod = ctx.current.module;
+    var obj = ctx.req.body;
     if(!obj) {
         obj = {};
     }

@@ -1,6 +1,9 @@
 module.exports = {
     getName:function(){return "elab.facebook";},
-    init:function(saram, mod, obj) {
+    init:function(ctx) {
+        var saram = ctx.saram;
+        var mod = ctx.current.module;
+        var obj = ctx.req.body;
         mod.name = obj.name;
         mod.client_id = obj.client_id;
         mod.client_secret = obj.client_secret;

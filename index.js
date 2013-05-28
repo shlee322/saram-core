@@ -44,24 +44,40 @@ var context = require('./context.js');
 var call = require('./call.js');
 var request = require('./request.js');
 var custom = require('./custom.js');
+var seCtx = require('./serverEventContext.js');
 
 /**
  * 새로운 Saram 객체를 생성하여 반환합니다.
  * @returns {newSaram} 생성된 Saram 객체
  */
-module.exports = function(op) {
-    if(!op) {
-        op = {
-            useManager : true
-        };
+module.exports = function(option) {
+    if(!option) {
+        option = {};
     }
-    return new newSaram(op);
+    if(!(option.useManager instanceof Boolean)) {
+        option.useManager = true;
+    }
+    if(!(option.clusterFile instanceof String)) {
+        option.clusterFile = "cluster.json";
+    }
+    if(!(option.nodeFile instanceof String)) {
+        option.nodeFile = "node.json";
+    }
+    return new newSaram(option);
 }
 
+function getNodeInfo(nodeFile) {
+    var fs = require('fs');
+    try {
+        var file = fs.readFileSync(nodeFile);
+        console.log(file);
+    } catch (e) {
+    }
+}
 /**
  * Saram 객체 생성 함수
  */
-function newSaram(op) {
+function newSaram(option) {
     var saram = this;
 
     this.load = saramLoadModule;
@@ -124,13 +140,17 @@ function newSaram(op) {
     //커스텀 로드
     this.custom = new custom(this);
 
+    //노드, 클러스터
+    this.myNodeInfo = getNodeInfo(option.nodeFile);
+
+
     //매니저 로드
     this.load(require('./modules/manager/'));
     this.use('elab.manager', 'core.manager');
     //매니저에서 관리할 모듈 디렉토리 추가
     this.getModuleObjectByMid('core.manager').callAction('addModulesDir', {dir:path.resolve(__dirname, 'modules/')},{});
     //웹 매니저 페이지 활성화
-    if(op.useManager) {
+    if(option.useManager) {
         this.weld('core.manager', 'admin');
     }
 }
@@ -153,7 +173,7 @@ function saramLoadModule(moduleContent) {
     this.moduleContents[name] = moduleContent;
 
     if(typeof(moduleContent.load)=="function") {
-        moduleContent.load(this, moduleContent);
+        moduleContent.load(seCtx(this, moduleContent, null, 'load'));
     }
 }
 
@@ -210,7 +230,9 @@ function saramUseModule(moduleName, mid, obj) {
     settingModuleBundle(this, moduleObject);
 
     if(typeof(moduleContent.init)=="function") {
-        moduleContent.init(this, moduleObject.obj, obj);
+        var ctx = seCtx(this, moduleContent, moduleObject, 'init');
+        ctx.req.body = obj;
+        moduleContent.init(ctx);
     }
 }
 

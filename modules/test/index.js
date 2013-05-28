@@ -1,9 +1,14 @@
 module.exports = {
     getName:function(){return "elab.test";},
-    load:function(saram, content) {
+    load:function(ctx) {
+        var saram = ctx.saram;
+        var mod = ctx.current.module;
         console.log("test load");
     },
-    init:function(saram, mObj, obj) {
+    init:function(ctx) {
+        var saram = ctx.saram;
+        var mod = ctx.current.module;
+        var obj = ctx.req.body;
         console.log("test init");
     },
     info:require('./info.js'),

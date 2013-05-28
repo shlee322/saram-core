@@ -12,7 +12,10 @@
  */
 module.exports = {
     getName:function(){return "elab.push";},
-    init:function(saram, mod, obj) {
+    init:function(ctx) {
+        var saram = ctx.saram;
+        var mod = ctx.current.module;
+        var obj = ctx.req.body;
         var service = obj.service;
         mod.service = {};
         for(var i in service) {
