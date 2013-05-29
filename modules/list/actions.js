@@ -47,8 +47,9 @@ module.exports = {
                 for(var i in dataParam) {
                     query += ", 0x" + ctx.param.get(dataParam[i][0], dataParam[i][1]);
                 }
-                query += ", ?)  ON DUPLICATE KEY UPDATE `value`=?;"
+                query += ", ?, ?)  ON DUPLICATE KEY UPDATE `value`=?;"
                 var values = [];
+                values.push(XXHash.hash(new Buffer(ctx.req.body.value), 0x654C6162));
                 for(var i=0; i<2; i++) {
                     values.push(ctx.req.body.value);
                 }

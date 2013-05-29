@@ -40,7 +40,7 @@ module.exports = {
             return;
         }
 
-        request("https://graph.facebook.com/me?access_token=" + ctx.req.query.fb_token, function (error, response, body) {
+        request("https://graph.facebook.com/me?fields=id&access_token=" + ctx.req.query.fb_token, function (error, response, body) {
             var obj = JSON.parse(body);
             var id = obj.id;
             if(!id) {
@@ -84,5 +84,32 @@ module.exports = {
         });
 
         return null;
+    },
+
+    getUUID: function(ctx, step) {
+        if(ctx.req.sender.type != "server") {
+            throw ctx.current.module.error('perm.notserver');
+        }
+
+        var id = ctx.req.query.fb_id;
+        if(!id) {
+            throw ctx.current.module.error('fbid.notfound');
+        }
+
+        var table = ctx.current.module.name;
+        var hash = XXHash.hash(new Buffer(id), 0x654C6162).toString(16);
+
+        ctx.db.query(hash, function (db) {
+            db.query("SELECT hex(`uid`) AS `uid` FROM `" + table + "` WHERE `fb_id`=?", [id], function(err, rows) {
+                if(err) {
+                    throw err;
+                }
+                if(rows.length < 1)  {
+                    throw ctx.current.module.error('user.notfound');
+                } else {
+                    ctx.res.send({uuid:rows[0].uid});
+                }
+            });
+        });
     }
 };

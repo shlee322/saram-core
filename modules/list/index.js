@@ -15,28 +15,21 @@ module.exports = {
             mod.overlap = true;
         }
 
-        var col = "";
-        for(var i in mod.param) {
-            col += "`" + mod.param[i][0] + "_" + mod.param[i][1] + "` BIGINT NULL ,";
-        }
+        var columns = {};
+        saram.db.utill.paramToColumns(columns, mod.param, "int64");
+        columns["hash"] = {type:"int64"};
+        columns["value"] = {type:"string", length:256};
+        var index = [];
+        saram.db.utill.paramToIndexColumns(index, mod.param);
+        index.push("hash");
 
-        var ind = "";
-        for(var i in mod.param) {
-            ind += "`" + mod.param[i][0] + "_" + mod.param[i][1] + "` ASC, ";
-        }
-
-        var query = "CREATE  TABLE `" + mod.name + "` (`uid` BIGINT NOT NULL , " + col + "`value`  VARCHAR(256) NULL ,PRIMARY KEY (`uid`)";
-        if(mod.param.length > 0 ) {
-            query += ", " + (!mod.overlap ? "UNIQUE " : "") + "INDEX `key` (" + ind + ")";
-        }
-        query += ");";
-
-        saram.db.query(null, function (db) {
-            db.query(query, function(err, rows) {
-                if(err) {
-                    console.log("ex");
-                }
-            });
+        saram.db.setTable(ctx, {
+            name : obj.name,
+            shardKey : function(nodeLength, Args) {
+                return 0;
+            },
+            columns : columns,
+            indexes : [{name:'key', type:mod.overlap ? "UNIQUE " : "INDEX", columns:index}]
         });
     },
     info:require('./info.js'),

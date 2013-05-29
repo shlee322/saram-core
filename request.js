@@ -42,7 +42,7 @@ function httpRequest(saram, req, res) {
 
     //404 Error
     if(!pipeline.found) {
-        ctx.res.error({code:"elab.saram.core.error.page.notfound"}, 404);
+        ctx.res.error({message:"페이지가 존재하지 않습니다.", module:{name:"saram.core", mid:""}, code:"page.notfound", object:{httpCode:404}});
         console.log(req.path);
         return;
     }

@@ -11,9 +11,9 @@ module.exports = function(saram, req, pipeline) {
     this.domain = domain.create();
     this.domain.on('error', function(er) {
         if(er.type != "saram.error") {
-            _this.res.error('core.error.uncaughtException', {module:{name:"saram.core", mid:""}, message:er.message, stack:er.stack});
+            _this.res.error({message:er.message, module:{name:"saram.core", mid:""}, code:'core.error.uncaughtException', stack:er.stack});
         } else {
-            _this.res.error(er.errorCode, {module:{name:er.errorModule.getModuleName(), mid:er.errorModule.getMid()}, object:er.errorObject, message:er.errorMessage, stack:er.stack});
+            _this.res.error({message:er.errorMessage, module:{name:er.errorModule.getModuleName(), mid:er.errorModule.getMid()}, code:er.errorCode, object:er.errorObject, stack:er.stack});
         }
     });
 

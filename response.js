@@ -14,7 +14,7 @@ function setHttpResponse(ctx, res) {
     response.raw.obj.responseCode = 200;
 
     response.info = function (obj) {
-        res.writeHead(response.raw.obj.responseCode, {"Content-Type": "application/json"});
+        res.writeHead(response.raw.obj.responseCode, {"Server":"saram.elab.kr/0.1.0", "Content-Type": "application/json"});
         res.end(JSON.stringify(obj));
     };
 
@@ -49,26 +49,18 @@ function setHttpResponse(ctx, res) {
                 });
             } else {
                 var html = template.viewer(obj);
-                res.writeHead(response.raw.obj.responseCode);
+                res.writeHead(response.raw.obj.responseCode, {"Server":"saram.elab.kr/0.1.0"});
                 res.end(html);
             }
         };
     }
 
-    response.error = function (name, obj, code) {
-        if(!code) {
-            code = 500;
-        }
+    response.error = function (error) {
         if(response.raw.type == "http") {
-            response.raw.obj.responseCode = code;
+            response.raw.obj.responseCode = (error.object && error.object.httpCode) ? error.object.httpCode : 500;
         }
 
-        response.info({
-                error:{
-                    code:name,
-                    obj:obj
-                }
-            });
+        response.info({error:error});
     };
 
     ctx.setResponse(response);
@@ -87,11 +79,7 @@ function setServerResponse(ctx, callback) {
     response.send = response.info;
 
     response.error = function (error, code) {
-        if(!code) {
-            code = 500;
-        }
-
-        //에러 처리
+        callback({error:error});
     };
 
     ctx.setResponse(response);
