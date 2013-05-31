@@ -100,29 +100,60 @@ function newSaram(option) {
     }
 
     this.call = {
-        get:function(path, query, callback){
-            request.serverRequest(saram, 'GET', path, query, null, callback);
+        get:function(path, query, callback, rootBundleMid){
+            request.serverRequest(saram, 'GET', rootBundleMid, path, query, null, callback);
         },
-        post:function(path, query, data, callback){
-            request.serverRequest(saram, 'POST', path, query, data, callback);
+        post:function(path, query, data, callback, rootBundleMid){
+            request.serverRequest(saram, 'POST', rootBundleMid, path, query, data, callback);
         },
-        put:function(path, query, data, callback){
-            request.serverRequest(saram, 'PUT', path, query, data, callback);
+        put:function(path, query, data, callback, rootBundleMid){
+            request.serverRequest(saram, 'PUT', rootBundleMid, path, query, data, callback);
         },
-        delete:function(path, query, data, callback){
-            request.serverRequest(saram, 'DELETE', path, query, data, callback);
+        delete:function(path, query, data, callback, rootBundleMid){
+            request.serverRequest(saram, 'DELETE', rootBundleMid, path, query, data, callback);
         }
     };
 
     this.moduleContents = {};
     this.moduleObjects = {};
-    //moduleObject
+
     this.rootModuleContent = {
         actions:{
-            root:function(ctx, next) {}
+            root:function(ctx, next) {},
+            serverOnly:function(ctx, next) {
+                if(ctx.req.sender.type != "server") {
+                    throw ctx.current.module.error('perm.notserver');
+                }
+            }
         }
     };
-    this.rootModuleObject = {};
+    this.rootModuleObject = {
+        getModuleName:function() {
+            return "saram.core";
+        },
+        getMid:function() {
+            return null;
+        },
+        error:function(code, obj) {
+            var error = new Error();
+            error.type = "saram.error";
+            error.errorModule = moduleObject.obj;
+            error.errorCode = code;
+            error.errorMessage = moduleContent.error ? moduleContent.error[code] : "";
+            error.errorObject = obj;
+            return error;
+        },
+        errorTry:function(condition, error, obj) {
+            if(condition) {
+                throw moduleObject.error(error, obj);
+            }
+        }
+    };
+    this.rootModuleObject.obj = { getModuleName:this.rootModuleObject.getModuleName,
+        getMid:this.rootModuleObject.getMid,
+        error:this.rootModuleObject.error,
+        errorTry:this.rootModuleObject.errorTry
+    };
     this.rootModuleObject.event = {};
     this.rootModuleObject.pipeBundle = new bundle();
     this.rootModuleObject.pipeBundle.moduleContent = this.rootModuleContent;
@@ -148,10 +179,10 @@ function newSaram(option) {
     this.load(require('./modules/manager/'));
     this.use('elab.manager', 'core.manager');
     //매니저에서 관리할 모듈 디렉토리 추가
-    this.getModuleObjectByMid('core.manager').callAction('addModulesDir', {dir:path.resolve(__dirname, 'modules/')},{});
+    //this.getModuleObjectByMid('core.manager').callAction('addModulesDir', {dir:path.resolve(__dirname, 'modules/')},{});
     //웹 매니저 페이지 활성화
     if(option.useManager) {
-        this.weld('core.manager', 'admin');
+        //this.weld('core.manager', 'admin');
     }
 }
 
@@ -209,10 +240,6 @@ function saramUseModule(moduleName, mid, obj) {
     moduleObject.getMid = function() {
         return mid;
     }
-    //DirectRequest
-    moduleObject.callAction = function(action, query, data, callback) {
-        request.directRequest(this, moduleContent, moduleObject, action, query, data, callback);
-    }
     moduleObject.error = function(code, obj) {
         var error = new Error();
         error.type = "saram.error";
@@ -222,8 +249,13 @@ function saramUseModule(moduleName, mid, obj) {
         error.errorObject = obj;
         return error;
     }
+    moduleObject.errorTry = function(condition, error, obj) {
+        if(condition) {
+            throw moduleObject.error(error, obj);
+        }
+    }
 
-    moduleObject.obj = {getModuleName:moduleObject.getModuleName, getMid:moduleObject.getMid, callAction:moduleObject.callAction, error:moduleObject.error};
+    moduleObject.obj = {getModuleName:moduleObject.getModuleName, getMid:moduleObject.getMid, error:moduleObject.error, errorTry:moduleObject.errorTry};
 
     this.moduleObjects[mid] = moduleObject;
 
@@ -263,6 +295,9 @@ function saramStartServer(port) {
  * @returns {*} 모듈 컨텐츠
  */
 function saramGetModuleContentByName(name) {
+    if(name == "saram.core") {
+        return this.rootModuleContent;
+    }
     var moduleContent = this.moduleContents[name];
     if(!moduleContent)
         return null;
@@ -325,6 +360,9 @@ function saramAddReceiver(targetMid, eventName, receiverMid, action) {
         targetObject = this.rootModuleObject;
     }
     var receiverObject = this.getModuleObjectByMid(receiverMid);
+    if(!receiverMid) {
+        receiverObject = this.rootModuleObject;
+    }
     var receiverContent = this.getModuleContentByName(receiverObject.getModuleName());
 
     if(!targetObject) {

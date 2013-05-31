@@ -10,11 +10,13 @@ module.exports = function(saram, req, pipeline) {
 
     this.domain = domain.create();
     this.domain.on('error', function(er) {
-        if(er.type != "saram.error") {
-            _this.res.error({message:er.message, module:{name:"saram.core", mid:""}, code:'core.error.uncaughtException', stack:er.stack});
-        } else {
-            _this.res.error({message:er.errorMessage, module:{name:er.errorModule.getModuleName(), mid:er.errorModule.getMid()}, code:er.errorCode, object:er.errorObject, stack:er.stack});
-        }
+        _this.run(function(){
+            if(er.type != "saram.error") {
+                _this.res.error({message:er.message, module:{name:"saram.core", mid:""}, code:'core.error.uncaughtException', stack:er.stack});
+            } else {
+                _this.res.error({message:er.errorMessage, module:{name:er.errorModule.getModuleName(), mid:er.errorModule.getMid()}, code:er.errorCode, object:er.errorObject, stack:er.stack});
+            }
+        });
     });
 
     //HEX값만
@@ -50,7 +52,10 @@ module.exports = function(saram, req, pipeline) {
     }
 
     this.run = function(func) {
-        this.domain.run(func);
+        _this.domain.run(func);
+    }
+
+    this.wait = function(funcArray, callback) {
     }
 
     this.db = {

@@ -7,7 +7,6 @@ var context = require('./context.js');
 module.exports = {
     httpRequest: httpRequest,
     serverRequest: serverRequest,
-    directRequest: directRequest,
     request: request
 };
 
@@ -82,7 +81,7 @@ function httpRequest(saram, req, res) {
  * @param data 요청 데이터
  * @param callback 콜백 함수
  */
-function serverRequest(saram, method, path, query, data, callback) {
+function serverRequest(saram, method, rootBundleMid, path, query, data, callback) {
     var req = {};
     req.sender = {type:"server", name:"local", direct:false};
     req.method = method;
@@ -98,40 +97,19 @@ function serverRequest(saram, method, path, query, data, callback) {
     if(!req.body) {
         req.body = {};
     }
-
-    var pipeline = saram.pipeBundle.getPipeline(req.method, req.path);
-    //404 Error
-    if(!pipeline.found) {
-        callback(null);
+    var rootModule = !rootBundleMid ? saram : saram.getModuleObjectByMid(rootBundleMid);
+    var pipeline = null;
+    if(rootModule) {
+        pipeline = rootModule.pipeBundle.getPipeline(req.method, req.path);
+    }
+    if(!rootModule || !pipeline.found) {
+        callback({error:{message:"페이지가 존재하지 않습니다.", module:{name:"saram.core", mid:""}, code:"page.notfound", object:{}}});
         return;
     }
 
     var ctx = new context(saram, req, pipeline);
     response.setServerResponse(ctx, callback);
     request(saram, ctx);
-}
-
-function directRequest(saram, moduleContent, moduleObject, actionName, query, data, callback) {
-    if(!query) {
-        query = {};
-    }
-
-    if(!data) {
-        data = {};
-    }
-
-    var req = {};
-    req.sender = {type:"server", name:"local", direct:true};
-    req.method = "GET";
-    req.query = query;
-    req.path = actionName;
-    req.data = data;
-
-    var ctx = new context(saram, req, []);
-
-    ctx.run(function(){
-        call.callAction(moduleContent, moduleObject, actionName, ctx, function(){}); //차후 콜백처리
-    });
 }
 
 /**
