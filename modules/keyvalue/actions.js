@@ -141,7 +141,7 @@ module.exports = {
                 where = "";
             }
 
-            db.query("SELECT hex(`uid`) AS `uid`, `str` as `key`, `value` FROM `" + table + "` WHERE " + where, [], function(err, rows) {
+            db.query("SELECT hex(`uid`) AS `uid`, `str` as `key`, `value` FROM `" + table + "` " + where, [], function(err, rows) {
                 if(err) {
                     throw err;
                 }
