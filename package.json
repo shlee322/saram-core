@@ -2,7 +2,11 @@
   "name": "saram-core",
   "description": "saram.elab.kr",
   "version": "0.0.1",
-  "private": true,
+  "repository": {
+      "type": "git",
+      "url": "git://github.com/saramjs/saram-core.git"
+  },
+  "author": "Lee Sanghyuck (http://profile.elab.kr)",
   "dependencies": {
       "xxhash": "0.1.3",
       "request": "2.16.2",
