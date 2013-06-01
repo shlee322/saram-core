@@ -5,5 +5,6 @@
 
 module.exports = [
     {type:"POST", url:"/signup", action:"signup"},
-    {type:"POST", url:"/signin", action:"signin"}
+    {type:"POST", url:"/signin", action:"signin"},
+    {type:"GET", url:"/get_uuid", action:"getUUID"}
 ];
