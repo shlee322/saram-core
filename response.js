@@ -14,7 +14,7 @@ function setHttpResponse(ctx, res) {
     response.raw.obj.responseCode = 200;
 
     response.info = function (obj) {
-        res.writeHead(response.raw.obj.responseCode, {"Server":"saram.elab.kr/0.1.0", "Content-Type": "application/json; charset=utf-8"});
+        res.writeHead(response.raw.obj.responseCode, {"Server":"saram.elab.kr/0.0.1", "Content-Type": "application/json; charset=utf-8"});
         res.end(JSON.stringify(obj));
     };
 
@@ -49,7 +49,7 @@ function setHttpResponse(ctx, res) {
                 });
             } else {
                 var html = template.viewer(obj);
-                res.writeHead(response.raw.obj.responseCode, {"Server":"saram.elab.kr/0.1.0"});
+                res.writeHead(response.raw.obj.responseCode, {"Server":"saram.elab.kr/0.0.1"});
                 res.end(html);
             }
         };
