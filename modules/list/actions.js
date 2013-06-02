@@ -25,7 +25,7 @@ module.exports = {
                 if(err) {
                     throw err;
                 }
-                ctx.res.send(rows);
+                ctx.res.send({items:rows});
                 step();
             });
         });
