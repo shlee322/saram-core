@@ -27,8 +27,8 @@ module.exports = {
                 throw ctx.current.module.error('error');
             }
             var list = [];
-            for(var i in obj) {
-                list.push(obj[i].value);
+            for(var i in obj.items) {
+                list.push(obj.items[i].value);
             }
             list.push(object);
             ctx.res.send({target:list});
