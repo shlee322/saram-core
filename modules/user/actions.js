@@ -50,7 +50,7 @@ module.exports = {
         return null;
     },
     myonly: function(ctx, step) {
-        if(ctx.param.get(ctx.current.module.getMid(), "uuid") != ctx.auth) {
+        if(ctx.param.get(ctx.current.module.getMid(), "uuid") != ctx.auth && ctx.req.sender.type != "server") {
             throw ctx.current.module.error('perm.myonly');
         }
     },

@@ -145,6 +145,9 @@ function newSaram(option) {
         },
         errorTry:function(condition, error, obj) {
             if(condition) {
+                if(error instanceof Error) {
+                    throw error;
+                }
                 throw moduleObject.error(error, obj);
             }
         }
@@ -251,6 +254,9 @@ function saramUseModule(moduleName, mid, obj) {
     }
     moduleObject.errorTry = function(condition, error, obj) {
         if(condition) {
+            if(error instanceof Error) {
+                throw error;
+            }
             throw moduleObject.error(error, obj);
         }
     }
