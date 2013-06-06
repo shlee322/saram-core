@@ -31,7 +31,7 @@ module.exports = {
         });
         return null;
     },
-    add : function (ctx, step) {
+    insert : function (ctx, step) {
         var table = ctx.current.module.name;
         var dataParam = ctx.current.module.param;
 
@@ -96,6 +96,66 @@ module.exports = {
                     throw ctx.current.module.error('uid.notfound');
                 }
                 ctx.res.send(rows[0]);
+                step();
+            });
+        });
+        return null;
+    },
+    update : function (ctx, step) {
+        var table = ctx.current.module.name;
+        var dataParam = ctx.current.module.param;
+
+        var hash = ctx.current.module.getMid();
+        for(var i in dataParam) {
+            hash += dataParam[i][0] + dataParam[i][1];
+        }
+        hash = XXHash.hash(new Buffer(hash), 0x654C6162).toString(16);
+
+        ctx.db.query(hash, function (db) {
+            var where = "WHERE `uid`=0x" + ctx.req.param.uid + " and ";
+            for(var i in dataParam) {
+                where += "`" + dataParam[i][0] + "_" + dataParam[i][1] + "`=0x" + ctx.param.get(dataParam[i][0], dataParam[i][1]) + " and ";
+            }
+            where = where.substring(0, where.length - 5);
+            if(where.length == 6) {
+                where = "";
+            }
+
+            db.query("UPDATE `" + table + "` SET `value`=? " + where, [ctx.req.body.value], function(err, rows) {
+                if(err) {
+                    throw err;
+                }
+                ctx.res.send({state:'OK'});
+                step();
+            });
+        });
+        return null;
+    },
+    delete : function (ctx, step) {
+        var table = ctx.current.module.name;
+        var dataParam = ctx.current.module.param;
+
+        var hash = ctx.current.module.getMid();
+        for(var i in dataParam) {
+            hash += dataParam[i][0] + dataParam[i][1];
+        }
+        hash = XXHash.hash(new Buffer(hash), 0x654C6162).toString(16);
+
+        ctx.db.query(hash, function (db) {
+            var where = "WHERE `uid`=0x" + ctx.req.param.uid + " and ";
+            for(var i in dataParam) {
+                where += "`" + dataParam[i][0] + "_" + dataParam[i][1] + "`=0x" + ctx.param.get(dataParam[i][0], dataParam[i][1]) + " and ";
+            }
+            where = where.substring(0, where.length - 5);
+            if(where.length == 6) {
+                where = "";
+            }
+
+            db.query("DELETE FROM `" + table + "` " + where, [], function(err, rows) {
+                if(err) {
+                    throw err;
+                }
+                ctx.res.send({state:'OK'});
                 step();
             });
         });
