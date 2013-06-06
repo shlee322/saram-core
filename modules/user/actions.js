@@ -7,10 +7,7 @@ module.exports = {
         if(!uuid.match(/^[0-9A-Fa-f]+$/)) {
             uuid = null;
         }
-        if(!uuid) {
-            throw ctx.current.module.error('weld.notuuid');
-        }
-
+        ctx.current.module.errorTry(!uuid, 'uuid.notfound');
         ctx.param.set(ctx.current.module.getMid(), "uuid", uuid);
     },
     signin: function(ctx, step) {
@@ -32,6 +29,10 @@ module.exports = {
             });
         });
         return null;
+    },
+    get_uuid : function(ctx, step) {
+        ctx.current.module.errorTry(!ctx.auth, 'uuid.notfound');
+        ctx.res.send({uuid:ctx.auth});
     },
     auth: function(ctx, step) {
         if(!ctx.req.query.access_token) {
