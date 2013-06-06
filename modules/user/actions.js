@@ -30,7 +30,7 @@ module.exports = {
         });
         return null;
     },
-    get_uuid : function(ctx, step) {
+    my_uuid : function(ctx, step) {
         ctx.current.module.errorTry(!ctx.auth, 'uuid.notfound');
         ctx.res.send({uuid:ctx.auth});
     },
