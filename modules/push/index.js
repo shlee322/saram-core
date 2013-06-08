@@ -1,15 +1,3 @@
-/*
- /add/:service : 디바이스 추가
- /send
-
- {
-  service : {
-   gcm : {
-    type : "gcm",
-    key: ""
-   }
-  }
- */
 module.exports = {
     getName:function(){return "elab.push";},
     init:function(ctx) {
@@ -19,7 +7,20 @@ module.exports = {
         var service = obj.service;
         mod.service = {};
         for(var i in service) {
-            mod.service[i] = new require('./service/'+service[i].type+".js")(i, service[i]);
+            var moduleName = ctx.current.module.getMid()+'.'+i;
+            ctx.saram.use('elab.list', ctx.current.module.getMid()+'.'+i, {
+                name:ctx.current.module.getMid()+"_"+i,
+                param : obj.param,
+                overlap:false
+            });
+            ctx.saram.weld(ctx.current.module.getMid(), moduleName, i);
+            ctx.saram.addReceiver(moduleName, 'call.get.before', null, 'serverOnly');
+            ctx.saram.addReceiver(moduleName, 'call.insert.before', null, 'serverOnly');
+            ctx.saram.addReceiver(moduleName, 'call.update.before', null, 'serverOnly');
+            ctx.saram.addReceiver(moduleName, 'call.delete.before', null, 'serverOnly');
+
+            var ser = require('./service/'+service[i].type+".js");
+            mod.service[i] = new ser(ctx, i, service[i]);
         }
     },
     info:require('./info.js'),

@@ -81,7 +81,7 @@ function httpRequest(saram, req, res) {
  * @param data 요청 데이터
  * @param callback 콜백 함수
  */
-function serverRequest(saram, method, rootBundleMid, path, query, data, callback) {
+function serverRequest(saram, method, rootBundleMid, path, query, data, callback, extend) {
     var req = {};
     req.sender = {type:"server", name:"local", direct:false};
     req.method = method;
@@ -97,6 +97,11 @@ function serverRequest(saram, method, rootBundleMid, path, query, data, callback
     if(!req.body) {
         req.body = {};
     }
+    if(!extend) {
+        extend = {
+            param : {_data : {}}
+        };
+    }
     var rootModule = !rootBundleMid ? saram : saram.getModuleObjectByMid(rootBundleMid);
     var pipeline = null;
     if(rootModule) {
@@ -108,6 +113,13 @@ function serverRequest(saram, method, rootBundleMid, path, query, data, callback
     }
 
     var ctx = new context(saram, req, pipeline);
+    for(var i in extend.param._data) {
+        ctx.param._data[i] = {};
+        for(var key in extend.param._data[i]) {
+            ctx.param._data[i][key] = extend.param._data[i][key];
+        }
+    }
+
     response.setServerResponse(ctx, callback);
     request(saram, ctx);
 }

@@ -66,13 +66,25 @@ module.exports = function(option) {
     return new newSaram(option);
 }
 
-function getNodeInfo(nodeFile) {
+function loadFile(file) {
     var fs = require('fs');
     try {
-        var file = fs.readFileSync(nodeFile);
-        console.log(file);
+        return JSON.parse(fs.readFileSync(file, 'utf-8'));
     } catch (e) {
     }
+    return null;
+}
+function getNode(nodeFile) {
+    var data = loadFile(nodeFile);
+    return {
+        getDomain : function() {
+            return data ? data.domain : [];
+        }
+    };
+}
+function getCluster(clusterFile) {
+    var data = loadFile(clusterFile);
+    return null;
 }
 /**
  * Saram 객체 생성 함수
@@ -100,17 +112,17 @@ function newSaram(option) {
     }
 
     this.call = {
-        get:function(path, query, callback, rootBundleMid){
-            request.serverRequest(saram, 'GET', rootBundleMid, path, query, null, callback);
+        get:function(path, query, callback, rootBundleMid, extend){
+            request.serverRequest(saram, 'GET', rootBundleMid, path, query, null, callback, extend);
         },
-        post:function(path, query, data, callback, rootBundleMid){
-            request.serverRequest(saram, 'POST', rootBundleMid, path, query, data, callback);
+        post:function(path, query, data, callback, rootBundleMid, extend){
+            request.serverRequest(saram, 'POST', rootBundleMid, path, query, data, callback, extend);
         },
-        put:function(path, query, data, callback, rootBundleMid){
-            request.serverRequest(saram, 'PUT', rootBundleMid, path, query, data, callback);
+        put:function(path, query, data, callback, rootBundleMid, extend){
+            request.serverRequest(saram, 'PUT', rootBundleMid, path, query, data, callback, extend);
         },
-        delete:function(path, query, data, callback, rootBundleMid){
-            request.serverRequest(saram, 'DELETE', rootBundleMid, path, query, data, callback);
+        delete:function(path, query, data, callback, rootBundleMid, extend){
+            request.serverRequest(saram, 'DELETE', rootBundleMid, path, query, data, callback, extend);
         }
     };
 
@@ -175,8 +187,8 @@ function newSaram(option) {
     this.custom = new custom(this);
 
     //노드, 클러스터
-    this.myNodeInfo = getNodeInfo(option.nodeFile);
-
+    this.node = getNode(option.nodeFile);
+    this.cluster = getCluster(option.clusterFile);
 
     //매니저 로드
     this.load(require('./modules/manager/'));
@@ -219,6 +231,9 @@ function saramLoadModule(moduleContent) {
  * @param obj 모듈 초기화에 필요한 오브젝트 (선택사항)
  */
 function saramUseModule(moduleName, mid, obj) {
+    if(!obj) {
+        obj = {};
+    }
     if(!this.moduleContents[moduleName]) {
         console.log("존재하지 않는 모듈입니다. - " + mid);
         return;
