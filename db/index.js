@@ -9,6 +9,7 @@ function newDB(saram) {
     this.saram = saram;
     this.addNode = addNode;
     this.setTable = setTable;
+    this.setQuery = setQuery;
     this.query = temp_query;
 
     this.cluster = {};
@@ -97,12 +98,6 @@ function temp_query(sharedKey, func, clusterName, ctx) {
     }
 }
 
-function addQuery(queryName, func) {
-}
-
-function execute(queryName, obj) {
-}
-
 function setTable(ctx, data) {
     if(typeof(data.name) != "string") {
         throw new Error();
@@ -164,4 +159,20 @@ function setTable(ctx, data) {
     for(var node in cluster) {
         cluster[node].setTable(ctx, data);
     }
+}
+
+function setQuery(ctx, obj) {
+    /*
+     {
+     name:"testQuery",
+     action:"insert",
+     table:"",
+     columns:[
+     id:
+     ]
+     }
+     */
+}
+
+function execute(queryName, obj) {
 }
