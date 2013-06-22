@@ -99,6 +99,7 @@ function newSaram(option) {
     this.getModuleObjectByMid = saramGetModuleObjectByMid;
     this.weld = saramWeld;
     this.addReceiver = saramAddReceiver;
+    this.autoLoad = saramAutoLoad;
 
     this.db = db(this);
     this.cache = cache(this);
@@ -287,6 +288,23 @@ function saramUseModule(moduleName, mid, obj) {
         ctx.req.body = obj;
         moduleContent.init(ctx);
     }
+}
+
+function saramAutoLoad(moduleContent, mid, obj, parentMid, path, weld) {
+    this.load(moduleContent);
+    this.use(moduleContent.getName(), mid, obj);
+
+    //content, mid, obj, rootPath
+    if(parentMid && !path && !weld) {
+        var temp = parentMid;
+        parentMid = mid;
+        mid = temp;
+    }
+    //content, mid, obj
+    if(!parentMid) {
+        parentMid = mid;
+    }
+    this.weld(parentMid, mid, path, weld);
 }
 
 /**
