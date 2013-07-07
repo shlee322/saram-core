@@ -1,154 +1,133 @@
 var XXHash = require('xxhash');
+var DB = require('../../system/db/index.js');
+var DBUtill = require('../../system/db/utill.js');
 
 module.exports = {
-    getWeld : function (ctx, step) {
-        var table = ctx.current.module.name;
-        var dataParam = ctx.current.module.param;
+    getWeld : function (ctx) {
+        var _module = ctx.current.module;
 
-        var hash = ctx.current.module.getMid();
+        var table = _module.config.name;
+        var dataParam = _module.config.param;
+
+        var hash = _module.getMid();
         for(var i in dataParam) {
             hash += dataParam[i][0] + dataParam[i][1];
         }
-        if(ctx.current.module.list) {
+        if(_module.list) {
             hash += "key" + ctx.req.param.key;
         }
         hash = XXHash.hash(new Buffer(hash), 0x654C6162).toString(16);
 
-        ctx.db.query(hash, function (db) {
-            var where = "";
-            var data = [];
-            for(var i in dataParam) {
-                where += "`" + dataParam[i][0] + "_" + dataParam[i][1] + "`=0x" + ctx.param.get(dataParam[i][0], dataParam[i][1]) + " and ";
-            }
-            where += "`key`=?";
-            data.push(XXHash.hash(new Buffer(ctx.req.param.key), 0x654C6162));
+        var where = "";
+        var data = [];
+        for(var i in dataParam) {
+            where += "`" + dataParam[i][0] + "_" + dataParam[i][1] + "`=0x" + ctx.param.get(dataParam[i][0], dataParam[i][1]) + " and ";
+        }
+        where += "`key`=?";
+        data.push(XXHash.hash(new Buffer(ctx.req.param.key), 0x654C6162));
 
-            db.query("SELECT hex(`uid`) AS `uid`, `value` FROM `" + table + "` WHERE " + where, data, function(err, rows) {
-                if(err) {
-                    throw err;
-                }
-                if(rows.length < 1)  {
-                    throw ctx.current.module.error('key.notfound');
-                } else {
-                    ctx.param.set(ctx.current.module.getMid(), "key", rows[0].uid.toString());
-                    step();
-                }
+        var query = "SELECT hex(`uuid`) AS `uuid`, `value` FROM `" + table + "` WHERE " + where;
+
+        var _current = ctx.current;
+        _current.autoNext = false;
+
+        DB.rawQuery(ctx, hash, function (db) {
+            db.rawQuery(ctx, query, data, function(err, rows) {
+                ctx.errorTry(err, err);
+                ctx.errorTry(rows.length < 1, Error);
+
+                ctx.param.set(ctx.current.module.getMid(), "key", rows[0].uid.toString());
+                _current.next();
             });
         });
-        return null;
     },
-    get : function (ctx, step) {
-        var table = ctx.current.module.name;
-        var dataParam = ctx.current.module.param;
+    get : function (ctx) {
+        var _current = ctx.current;
+        _current.autoNext = false;
 
-        var hash = ctx.current.module.getMid();
-        for(var i in dataParam) {
-            hash += dataParam[i][0] + dataParam[i][1];
-        }
-        if(ctx.current.module.list) {
-            hash += "key" + ctx.req.param.key;
-        }
-        hash = XXHash.hash(new Buffer(hash), 0x654C6162).toString(16);
+        DB.execute(ctx, 'keyvalue.get', { key : XXHash.hash(new Buffer(ctx.req.param.key), 0x654C6162)}, function (err, rows) {
+            ctx.errorTry(err, err);
+            ctx.errorTry(rows.length < 1, Error);
 
-        ctx.db.query(hash, function (db) {
-            var where = "";
-            var data = [];
-            for(var i in dataParam) {
-                where += "`" + dataParam[i][0] + "_" + dataParam[i][1] + "`=0x" + ctx.param.get(dataParam[i][0], dataParam[i][1]) + " and ";
-            }
-            where += "`key`=?";
-            data.push(XXHash.hash(new Buffer(ctx.req.param.key), 0x654C6162));
-
-            db.query("SELECT hex(`uid`) AS `uid`, `value` FROM `" + table + "` WHERE " + where, data, function(err, rows) {
-                if(err) {
-                    throw err;
-                }
-                if(rows.length < 1)  {
-                    throw ctx.current.module.error('key.notfound');
-                } else {
-                    ctx.res.send({uid:rows[0].uid.toString(),  value:rows[0].value});
-                }
-
-                step();
-            });
+            ctx.res.send({uuid:rows[0].uuid.toString(),  value:rows[0].value});
+            _current.next();
         });
-        return null;
     },
-    set : function (ctx, step) {
-        var table = ctx.current.module.name;
-        var dataParam = ctx.current.module.param;
+    set : function (ctx) {
+        var _module = ctx.current.module;
 
-        var hash = ctx.current.module.getMid();
+        var table = _module.config.name;
+        var dataParam = _module.config.param;
+
+        var hash = _module.getMid();
         for(var i in dataParam) {
             hash += dataParam[i][0] + dataParam[i][1];
         }
-        if(ctx.current.module.list) {
+        if(_module.list) {
             hash += "key" + ctx.req.param.key;
         }
         hash = XXHash.hash(new Buffer(hash), 0x654C6162).toString(16);
 
-        ctx.saram.generateUID(function (uid) {
-            ctx.db.query(hash, function (db) {
-                var query = "INSERT INTO `" + table + "` VALUES(0x" + uid;
-                for(var i in dataParam) {
-                    query += ", 0x" + ctx.param.get(dataParam[i][0], dataParam[i][1]);
-                }
-                query += ", ?, ?, ?)  ON DUPLICATE KEY UPDATE `str`=?, `value`=?;"
-                var values = [];
-                values.push(XXHash.hash(new Buffer(ctx.req.param.key), 0x654C6162));
-                for(var i=0; i<2; i++) {
-                    values.push(ctx.req.param.key);
-                    values.push(ctx.req.body.value);
-                }
+        var _current = ctx.current;
+        _current.autoNext = false;
 
-                db.query(query, values, function(err, rows) {
-                    if(err) {
-                        throw err;
-                    } else {
-                        ctx.res.send({state:"OK", uid:uid});
+        ctx.req.data.readKey("value", function() {
+            ctx.getSaram().uuid.generate(function (uuid) {
+                DB.rawQuery(ctx, hash, function (db) {
+                    var query = "INSERT INTO `" + table + "` VALUES(0x" + uuid;
+                    for(var i in dataParam) {
+                        query += ", 0x" + ctx.param.get(dataParam[i][0], dataParam[i][1]);
+                    }
+                    query += ", ?, ?, ?)  ON DUPLICATE KEY UPDATE `str`=?, `value`=?;"
+                    var values = [];
+                    values.push(XXHash.hash(new Buffer(ctx.req.param.key), 0x654C6162));
+                    for(var i=0; i<2; i++) {
+                        values.push(ctx.req.param.key);
+                        values.push(ctx.req.data.getValue("value"));
                     }
 
-                    step();
+                    db.rawQuery(ctx, query, values, function(err, rows) {
+                        ctx.errorTry(err, err);
+                        ctx.res.send({state:"OK", uuid:uuid});
+                        _current.next();
+                    });
                 });
             });
         });
-
-        return null;
     },
-    list : function (ctx, step) {
-        if(!ctx.current.module.list) {
-            ctx.res.send({});
-            step();
-            return;
-        }
+    list : function (ctx) {
+        var _module = ctx.current.module;
+        ctx.errorTry(!_module.config.list, Error);
 
-        var table = ctx.current.module.name;
-        var dataParam = ctx.current.module.param;
+        var table = _module.config.name;
+        var dataParam = _module.config.param;
 
-        var hash = ctx.current.module.getMid();
+        var hash = _module.getMid();
         for(var i in dataParam) {
             hash += dataParam[i][0] + dataParam[i][1];
         }
         hash = XXHash.hash(new Buffer(hash), 0x654C6162).toString(16);
 
-        ctx.db.query(hash, function (db) {
-            var where = "WHERE ";
-            for(var i in dataParam) {
-                where += "`" + dataParam[i][0] + "_" + dataParam[i][1] + "`=0x" + ctx.param.get(dataParam[i][0], dataParam[i][1]) + " and ";
-            }
-            where = where.substring(0, where.length - 5);
-            if(where.length == 6) {
-                where = "";
-            }
+        var _current = ctx.current;
+        _current.autoNext = false;
 
-            db.query("SELECT hex(`uid`) AS `uid`, `str` as `key`, `value` FROM `" + table + "` " + where, [], function(err, rows) {
-                if(err) {
-                    throw err;
-                }
+        var where = "WHERE ";
+        for(var i in dataParam) {
+            where += "`" + dataParam[i][0] + "_" + dataParam[i][1] + "`=0x" + ctx.param.get(dataParam[i][0], dataParam[i][1]) + " and ";
+        }
+        where = where.substring(0, where.length - 5);
+        if(where.length == 6) {
+            where = "";
+        }
+
+        var query = "SELECT hex(`uid`) AS `uid`, `str` as `key`, `value` FROM `" + table + "` " + where;
+
+        DB.rawQuery(ctx, hash, function (db) {
+            db.rawQuery(ctx, query, [], function(err, rows) {
+                err.errorTry(err, err);
                 ctx.res.send({items:rows});
-                step();
+                _current.next();
             });
         });
-        return null;
     }
 };

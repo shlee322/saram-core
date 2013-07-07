@@ -1,30 +1,30 @@
-module.exports = function(ctx) {
-    var saram = ctx.saram;
-    var mod = ctx.current.module;
-    var obj = ctx.req.body;
-    if(!obj) {
-        obj = {};
-    }
-    mod.name = obj.name;
-    mod.userPath = obj.userPath;
-    if(!mod.name) {
-        mod.name = mod.getMid();
-    }
-    if(!obj.userPath) {
-        console.log("Error userPath");
-    }
+var DB = require('../../system/db/index.js');
 
-    initTable(saram, mod);
-}
+function initListModule(ctx) {
+    var _this = this;
 
-function initTable(saram, mod) {
-    var query = "CREATE  TABLE `" + mod.name + "` (`uid` BIGINT NOT NULL , `id` VARCHAR(64) NULL, `pw` VARCHAR(64) NULL, PRIMARY KEY (`uid`), UNIQUE INDEX `id` (`id` ASC));";
+    ctx.req.data.readKey(["name", "param", "list"], function() {
+        _this.config = {};
 
-    saram.db.query(null, function (db) {
-        db.query(query, function(err, rows) {
-            if(err) {
-                console.log("ex");
-            }
-        });
+        _this.config.name = ctx.req.data.getValue("name", _this.getMid());
+        _this.config.userPath = ctx.req.data.getValue("userPath");
+
+        ctx.errorTry(_this.config.userPath, Error);
+
+        initTable(ctx, _this);
     });
 }
+
+function initTable(ctx, module) {
+    var columns = {};
+    columns["id"] = {type:"string", length:64};
+    columns["pw"] = {type:"string", length:64};
+
+    DB.setTable(ctx, {
+        name : module.config.name,
+        columns : columns,
+        indexes : [{name:'id', type:'UNIQUE', columns:[["id","ASC"]]}]
+    });
+}
+
+module.exports = initListModule;

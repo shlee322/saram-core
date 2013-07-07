@@ -1,75 +1,70 @@
 var XXHash = require('xxhash');
 var nodeHash = require('node_hash/lib/hash');
+var DB = require('../../system/db/index.js');
+var Call = require('../../system/call/index.js');
+
 
 module.exports = {
-    signup: function(ctx, step) {
-        var table = ctx.current.module.name;
-        var id = ctx.req.body.id;
-        var pw = ctx.req.body.pw;
+    signup: function(ctx) {
+        ctx.current.autoNext = false;
 
-        var hash = XXHash.hash(new Buffer(id), 0x654C6162).toString(16);
+        var table = ctx.current.module.config.name;
 
-        ctx.saram.generateUID(function (uid) {
-            ctx.db.query(hash, function (db) {
-                db.query("INSERT INTO `" + table + "`  VALUES(0x" + uid + ", ?, ?);", [id, nodeHash.sha256(pw)], function(err, rows) {
-                    if(err) {
-                        throw err;
-                    } else {
+        ctx.req.data.readKey(["id", "pw"], function() {
+            var id = ctx.req.data.getValue("id");
+            var pw = ctx.req.data.getValue("pw");
+
+            var hash = XXHash.hash(new Buffer(id), 0x654C6162).toString(16);
+
+            ctx.getSaram().uuid.generate(function (uuid) {
+                DB.rawQuery(ctx, hash, function (db) {
+                    db.rawQuery(ctx, "INSERT INTO `" + table + "`  VALUES(0x" + uuid + ", ?, ?);", [id, nodeHash.sha256(pw)], function(err, rows) {
+                        ctx.errorTry(err, err);
                         ctx.res.send({state:"OK"});
-                    }
-
-                    step();
+                        ctx.current.next();
+                    });
                 });
             });
         });
-
-        return null;
     },
-    signin: function(ctx, step) {
-        var table = ctx.current.module.name;
-        var id = ctx.req.body.id;
-        var pw = ctx.req.body.pw;
+    signin: function(ctx) {
+        ctx.current.autoNext = false;
 
-        var hash = XXHash.hash(new Buffer(id), 0x654C6162).toString(16);
+        var table = ctx.current.module.config.name;
+        ctx.req.data.readKey(["id", "pw"], function() {
+            var id = ctx.req.data.getValue("id");
+            var pw = ctx.req.data.getValue("pw");
 
-        ctx.db.query(hash, function (db) {
-            db.query("SELECT hex(`uid`) AS `uid` FROM `" + table + "` WHERE `id`=? and `pw`=?", [id, nodeHash.sha256(pw)], function(err, rows) {
-                if(err) {
-                    throw err;
-                }
-                if(rows.length < 1)  {
-                    throw ctx.current.module.error('account.notfound');
-                } else {
-                    ctx.saram.call.post(ctx.current.module.userPath + "/signin", null, {uuid:rows[0].uid}, function(obj) {
+            var hash = XXHash.hash(new Buffer(id), 0x654C6162).toString(16);
+
+            DB.rawQuery(ctx, hash, function (db) {
+                db.rawQuery(ctx, "SELECT hex(`uuid`) AS `uuid` FROM `" + table + "` WHERE `id`=? and `pw`=?", [id, nodeHash.sha256(pw)], function(err, rows) {
+                    ctx.errorTry(err, err);
+                    ctx.errorTry(rows.length < 1, err); //'account.notfound'
+                    Call.post(ctx, ctx.current.module.config.userPath + "/signin", {data:{uuid:rows[0].uuid}}, function(obj) {
                         ctx.res.send(obj);
+                        ctx.current.next();
                     });
-                }
-
-                step();
+                });
             });
         });
-        return null;
     },
-    getUUID: function(ctx, step) {
-        ctx.current.module.errorTry(ctx.req.sender.type != "server", 'perm.notserver');
-        var table = ctx.current.module.name;
+    getUUID: function(ctx) {
+        ctx.current.autoNext = false;
+        ctx.errorTry(ctx.req.sender.type != "server", Error); // 'perm.notserver'
+        var table = ctx.current.module.config.name;
         var id = ctx.req.query.id;
-        if(!id) {
-            throw ctx.current.module.error('id.notfound');
-        }
+
+        ctx.errorTry(!id, Error); // id.netfound
 
         var hash = XXHash.hash(new Buffer(id), 0x654C6162).toString(16);
 
-        ctx.db.query(hash, function (db) {
-            db.query("SELECT hex(`uid`) AS `uid` FROM `" + table + "` WHERE `id`=?", [id], function(err, rows) {
-                if(err) {
-                    throw err;
-                }
-                if(rows.length < 1)  {
-                    throw ctx.current.module.error('account.notfound');
-                } else {
-                    ctx.res.send({uuid:rows[0].uid});
-                }
+        DB.rawQuery(ctx, hash, function (db) {
+            db.rawQuery(ctx, "SELECT hex(`uuid`) AS `uuid` FROM `" + table + "` WHERE `id`=?", [id], function(err, rows) {
+                ctx.errorTry(err, err);
+                ctx.errorTry(rows.length < 1, err); //'account.notfound'
+                ctx.res.send({uuid:rows[0].uuid});
+                ctx.current.next();
             });
         });
     }
