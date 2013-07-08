@@ -3,41 +3,45 @@
  * @param arr [["mid","param"]]
  * @constructor
  */
-function DBParam(arr) {
+function DBParam(arr, columnType, indexType) {
     this._param = arr;
-    this._lastIndex = [];
-    this.indexName = 'key';
-    this.indexType = 'UNIQUE';
+    this.columnType = columnType ? columnType : "int64";
+    this.indexType = indexType ? indexType : "INDEX";
 }
 
-DBParam.prototype.addLastIndex = function (index) {
-    this._lastIndex.push(index);
-}
+DBParam.prototype.getColumns = function (columns) {
+    columns = columns ? columns : {};
 
-DBParam.prototype.toColumns = function (columns, type) {
+    var newColumns = {};
     for(var i in this._param) {
-        columns[this._param[i][0] + "_" + this._param[i][1]] = type;
+        newColumns[this._param[i][0] + "_" + this._param[i][1]] = this.columnType;
     }
+
+    for(var name in columns)
+        newColumns[name] = columns[name];
+
+    return newColumns;
 }
 
-DBParam.prototype.toIndexColumns = function (indexColumns, type) {
-    if(!type) {
-        type = "ASC";
-    }
-    for(var i in this._param) {
-        indexColumns.push([this._param[i][0] + "_" + this._param[i][1], type]);
-    }
-    for(var i in this._lastIndex) {
-        indexColumns.push(this._lastIndex[i]);
-    }
-}
+DBParam.prototype.getIndex = function (name, lastIndex) {
+    if(!name)
+        name = "key";
 
-DBParam.prototype.getIndex = function () {
-    var index=[];
-    this.toIndexColumns(index);
-    if(index.length < 1)
+    lastIndex = lastIndex ? lastIndex : [];
+
+    var paramIndex = [];
+
+    for(var i in this._param)
+        paramIndex.push([this._param[i][0] + "_" + this._param[i][1], "ASC"]);
+    for(var i in lastIndex)
+        paramIndex.push(lastIndex[i]);
+
+    if(paramIndex.length < 1)
         return null;
-    return {name:this.indexName, type:this.indexType, columns:index};
+
+    return {name:name, type:this.indexType, columns:paramIndex};
 }
+
+
 
 module.exports = DBParam;

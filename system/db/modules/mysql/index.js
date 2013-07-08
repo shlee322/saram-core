@@ -35,6 +35,8 @@ Mysql.prototype.setTable = function (ctx, table) {
     }
     for(var index in table.indexes) {
         var data = table.indexes[index];
+        if(!data)
+            continue;
         if(data.type != "INDEX") {
             query += data.type + " ";
         }

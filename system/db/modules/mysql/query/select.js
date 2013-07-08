@@ -26,10 +26,9 @@ function SelectQuery(ctx, query) {
             var condition = query.conditions[i];
 
             if(condition.oper == "param") {
-                var param = this.table.param;
-                for (var p in param._param) {
-                    rawQuery += "`" + param._param[p][0] + "_" + param._param[p][1] + "`=? and ";
-                }
+                var paramColumns = condition.param.getColumns();
+                for(var p in paramColumns)
+                    rawQuery += "`" + p + "`=? and ";
             } else if(condition.oper == "equal") {
                 rawQuery += "`" + condition.column + "`=? and ";
             }
@@ -46,14 +45,31 @@ SelectQuery.prototype.execute = function (ctx, node, args, callback) {
     if(this.query.conditions instanceof Array) {
         for(var i in this.query.conditions) {
             var condition = this.query.conditions[i];
+            /*
+            if(column instanceof DBParam) {
+                var param = column.getColumns();
+                for (var p in param._param) {
+                    rawArgs.push(ctx.param.get(param._param[p][0], param._param[p][1]));
+                }
+            } else if(typeof column == "function") {
+                rawArgs.push(column(ctx, args));
+            } else {
+                rawArgs.push(args[column]);
+            }*/
+
+
 
             if(condition.oper == "param") {
-                var param = this.table.param;
+                var param = condition.param;
                 for (var p in param._param) {
                     rawArgs.push(ctx.param.get(param._param[p][0], param._param[p][1]));
                 }
             } else if(condition.oper == "equal") {
-                rawArgs.push(args[condition.var]);
+                if(typeof condition.var == "function") {
+                    rawArgs.push(condition.var(ctx, args));
+                } else {
+                    rawArgs.push(args[condition.var]);
+                }
             }
         }
     }

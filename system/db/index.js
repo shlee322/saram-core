@@ -11,17 +11,6 @@ exports.setTable = function (ctx, table) {
     if(!(table.indexes instanceof Array))
         table.indexes = [];
 
-    if(table.param instanceof Array)
-        table.param = new Param(table.param);
-    if(!(table.param instanceof Param))
-        table.param = new Param();
-
-    var temp = table.columns;
-    table.columns = {};
-    table.param.toColumns(table.columns, "int64");
-    for(var i in temp)
-        table.columns[i] = temp[i];
-
     for(var i in table.columns) {
         var column = table.columns[i];
         if(typeof(column) == "string") {
@@ -39,12 +28,13 @@ exports.setTable = function (ctx, table) {
         }
     }
 
-    var paramIndex = table.param.getIndex();
-    if(paramIndex)
-        table.indexes.push(paramIndex);
-
+    var removeIndex = [];
     for(var i in table.indexes) {
         var index = table.indexes[i];
+        if(!index) {
+            removeIndex.push(index);
+            continue;
+        }
         if(!index.type) {
             index.type = "INDEX";
         }
@@ -55,6 +45,10 @@ exports.setTable = function (ctx, table) {
                 index.columns[columns_index] = [column ,"ASC"];
             }
         }
+    }
+
+    for(var i in removeIndex) {
+        //삭제
     }
 
     var clusterName = 'default';

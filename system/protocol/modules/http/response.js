@@ -17,7 +17,7 @@ HttpResponse.prototype.send = function (data) {
 
 HttpResponse.prototype.error = function (data) {
     this._raw.writeHead(501, {"Server":SERVER, "Content-Type": "application/json; charset=utf-8"});
-    this._raw.end(JSON.stringify({error:{message:data.message, stack:data.stack}}));
+    this._raw.end(JSON.stringify({error:{mid:data.mid, code:data.code, message:data.message, stack:data.stack}}));
 }
 
 HttpResponse.prototype.__proto__ = Response.prototype;
