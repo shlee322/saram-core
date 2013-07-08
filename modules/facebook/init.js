@@ -13,18 +13,35 @@ function initFacebookModule(ctx) {
 
         ctx.errorTry(!_this.config.userPath, Error); // Error userPath
 
-        initTable(ctx, _this);
-    });
-}
+        var columns = {};
+        columns["fb_id"] = {type:"int64"};
 
-function initTable(ctx, module) {
-    var columns = {};
-    columns["fb_id"] = {type:"bigint"};
+        DB.setTable(ctx, {
+            name : _this.config.name,
+            columns : columns,
+            indexes : [{name:'id', type:'UNIQUE', columns:[["fb_id","ASC"]]}]
+        });
 
-    DB.setTable(ctx, {
-        name : module.config.name,
-        columns : columns,
-        indexes : [{name:'id', type:'UNIQUE', columns:[["fb_id","ASC"]]}]
+        DB.setQuery(ctx, {
+            name : "facebook.getUUID",
+            action : 'select',
+            table : _this.config.name,
+            columns : {
+                uuid : 'uuid'
+            },
+            conditions : [
+                { oper:'equal', column:'fb_id', var:'fb_id' }
+            ]
+        });
+
+        DB.setQuery(ctx, {
+            name : "facebook.register",
+            action : 'insert',
+            table : _this.config.name,
+            columns : {
+                fb_id : "fb_id"
+            }
+        });
     });
 }
 

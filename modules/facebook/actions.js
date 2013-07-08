@@ -49,34 +49,24 @@ module.exports = {
 
             ctx.errorTry(!id, Error); // 'fbtoken.expired'
 
-            var table = ctx.current.module.config.name;
-            var hash = XXHash.hash(new Buffer(id), 0x654C6162).toString(16);
+            DB.execute(ctx, 'facebook.getUUID', { fb_id:id }, function (err, rows) {
+                ctx.errorTry(err, err);
 
-            DB.rawQuery(ctx, hash, function (db) {
-                db.rawQuery(ctx, "SELECT hex(`uid`) AS `uid` FROM `" + table + "` WHERE `fb_id`=?", [id], function(err, rows) {
-                    ctx.errorTry(err, err);
-
-                    if(rows.length < 1)  {
-                        ctx.getSaram().uuid.generate(function (uuid) {
-                            DB.rawQuery(ctx, hash, function (db) {
-                                db.rawQuery(ctx, "INSERT INTO `" + table + "`  VALUES(0x" + uuid + ", ?);", [id], function(err, rows) {
-                                    ctx.errorTry(err, err);
-
-                                    Call.post(ctx, ctx.current.module.config.userPath + "/signin", {data:{uuid:uuid}}, function(obj) {
-                                        ctx.res.send(obj);
-                                        ctx.current.next();
-                                    });
-                                });
-                            });
-                        });
-                        return;
-                    } else {
-                        Call.post(ctx, ctx.current.module.config.userPath + "/signin", {data:{uuid:rows[0].uuid}}, function(obj) {
+                if(rows.length < 1)  {
+                    DB.execute(ctx, 'facebook.register', { fb_id:id }, function (err, rows) {
+                        Call.post(ctx, ctx.current.module.config.userPath + "/signin", {data:{uuid:rows.uuid}}, function(obj) {
                             ctx.res.send(obj);
                             ctx.current.next();
                         });
-                    }
+                    });
+                    return;
+                }
+
+                Call.post(ctx, ctx.current.module.config.userPath + "/signin", {data:{uuid:rows[0].uuid}}, function(obj) {
+                    ctx.res.send(obj);
+                    ctx.current.next();
                 });
+
             });
         });
 
