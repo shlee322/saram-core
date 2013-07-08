@@ -1,4 +1,3 @@
-
 var XXHash = require('xxhash');
 var DB = require('../../system/db/index.js');
 var DBParam = require('../../system/db/param.js');
