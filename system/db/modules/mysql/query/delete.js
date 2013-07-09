@@ -1,24 +1,9 @@
-function SelectQuery(ctx, query) {
+function DeleteQuery(ctx, query) {
     this.module = ctx.current.module;
     this.query = query;
     this.table = ctx.current.module._dbTable[query.table];
 
-    var rawQuery = "SELECT ";
-    for(var i in query.columns) {
-        if(i=="uuid") {
-            rawQuery += "hex(`uuid`) AS `uuid`, ";
-            continue;
-        }
-
-        rawQuery += "`" + i +"`, ";
-    }
-    if(rawQuery.length != 7) {
-        rawQuery = rawQuery.substring(0, rawQuery.length - 2) + " ";
-    } else {
-        rawQuery += " * ";
-    }
-
-    rawQuery += "FROM `" + query.table + "` ";
+    var rawQuery = "DELETE FROM `" + query.table + "` ";
 
     if(query.conditions instanceof Array) {
         rawQuery += "WHERE ";
@@ -39,7 +24,7 @@ function SelectQuery(ctx, query) {
     this.rawQuery = rawQuery;
 }
 
-SelectQuery.prototype.execute = function (ctx, node, args, callback) {
+DeleteQuery.prototype.execute = function (ctx, node, args, callback) {
     var rawArgs = [];
 
     if(this.query.conditions instanceof Array) {
@@ -64,4 +49,4 @@ SelectQuery.prototype.execute = function (ctx, node, args, callback) {
     node.rawQuery(ctx, this.rawQuery, rawArgs, callback);
 }
 
-module.exports = SelectQuery;
+module.exports = DeleteQuery;
