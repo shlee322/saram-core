@@ -1,7 +1,7 @@
 function SaramError(ctx) {
     Error.captureStackTrace(this, SaramError);
 
-    this.mid = ctx.current.module.getMid();
+    this.mid = ctx.current.module ? ctx.current.module.getMid() : "saram.core";
     this.code = "";
     this.message = "";
 }
