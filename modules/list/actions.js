@@ -7,7 +7,7 @@ module.exports = {
         var _current = ctx.current;
         _current.autoNext = false;
 
-        DB.execute(ctx, 'list.getList', {}, function (err, rows) {
+        DB.execute(ctx, 'list.list', {}, function (err, rows) {
             ctx.errorTry(err, err);
             ctx.res.send({items:rows});
             _current.next();
@@ -52,7 +52,7 @@ module.exports = {
             });
         });
     },
-    delete : function (ctx, step) {
+    delete : function (ctx) {
         var _current = ctx.current;
         _current.autoNext = false;
 
