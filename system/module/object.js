@@ -28,4 +28,15 @@ ModuleObject.prototype.event = function (name, callback) {
     //Content 생성 후 진행
 }
 
+ModuleObject.prototype.setSkin = function (dir) {
+    if(this._skin == dir)
+        return;
+
+    this._skin = dir;
+}
+
+ModuleObject.prototype.getSkin = function () {
+    return this._skin;
+}
+
 module.exports = ModuleObject;

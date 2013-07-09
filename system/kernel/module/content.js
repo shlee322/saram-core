@@ -5,5 +5,5 @@ module.exports = moduleSys.init({
         return "saram.core";
     },
     actions:require('./actions.js'),
-    pipes:[{type:"WELD", name:"root", url:"/", action:"root"}]
+    pipes:[{type:"WELD", name:"root", url:"/", viewer:"root"}]
 });

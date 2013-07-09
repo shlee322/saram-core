@@ -1,5 +1,5 @@
 var Call = require('./call.js');
-var call = new Call();
+var Viewer = require('../viewer/index.js');
 
 function request(ctx, bundle) {
     bundle = bundle ? bundle : ctx.getSaram().getCoreModule().getBundle();
@@ -38,8 +38,12 @@ function routine(ctx, pipeline) {
         ctx.req.param[nowPipe.pipe.rawPath.param[index-1]] = nowPipe.match[index];
     }
 
-    call.callAction(ctx, nowPipe.module, actionName, function (){
-        routine(ctx, pipeline);
+    var viewer = nowPipe.pipe.viewer;
+    viewer.setResponse(ctx, function (res) {
+        Call.callAction(ctx, nowPipe.module, viewer.getAction(), function (){
+            ctx.res = res;
+            routine(ctx, pipeline);
+        });
     });
 }
 

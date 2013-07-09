@@ -1,6 +1,3 @@
-function Call() {
-}
-
 /**
  * 이벤트를 호출하는 함수
  * 이 함수가 호출되면 리시버에게 이벤트가 호출됬다는 것을 알림
@@ -9,14 +6,14 @@ function Call() {
  * @param ctx Context
  * @param callback 콜백 함수
  */
-Call.prototype.callEvent = function (ctx, module, event, callback) {
+exports.callEvent = function (ctx, module, event, callback) {
     var receiverList = module._event[event];
     if(!receiverList) {
         callback();
         return;
     }
 
-    this.callReceiver(ctx, receiverList.slice(0), callback);
+    exports.callReceiver(ctx, receiverList.slice(0), callback);
 }
 
 /**
@@ -26,15 +23,15 @@ Call.prototype.callEvent = function (ctx, module, event, callback) {
  * @param ctx Context
  * @param callback 콜백 함수
  */
-Call.prototype.callReceiver = function (ctx, receiverList, callback) {
+exports.callReceiver = function (ctx, receiverList, callback) {
     var receiver = receiverList.shift();
     if(!receiver) {
         callback();
         return;
     }
 
-    this.callAction(ctx, receiver.module, receiver.action, function (){
-        this.callReceiver(ctx, receiverList, callback);
+    exports.callAction(ctx, receiver.module, receiver.action, function (){
+        exports.callReceiver(ctx, receiverList, callback);
     });
 }
 
@@ -47,10 +44,10 @@ Call.prototype.callReceiver = function (ctx, receiverList, callback) {
  * @param ctx Context
  * @param step Call Next Step Function
  */
-Call.prototype.callAction = function (ctx, module, actionName, next) {
-    this.callEvent(ctx, module, "call." + actionName +".before", function() {
+exports.callAction = function (ctx, module, actionName, next) {
+    exports.callEvent(ctx, module, "call." + actionName +".before", function() {
         var after = function() {
-            this.callEvent(ctx, module, "call." + actionName +".after", function() {
+            exports.callEvent(ctx, module, "call." + actionName +".after", function() {
                 next();
             });
         }
@@ -65,5 +62,3 @@ Call.prototype.callAction = function (ctx, module, actionName, next) {
         }
     });
 }
-
-module.exports = Call;
