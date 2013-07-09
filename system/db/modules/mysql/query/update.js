@@ -1,24 +1,21 @@
-function SelectQuery(ctx, query) {
+var DBParam = require('../../../param.js');
+
+function UpdateQuery(ctx, query) {
     this.module = ctx.current.module;
     this.query = query;
     this.table = ctx.current.module._dbTable[query.table];
 
-    var rawQuery = "SELECT ";
+    var rawQuery = "UPDATE `" + query.table + "` SET ";
     for(var i in query.columns) {
-        if(i=="uuid") {
+        /*if(i=="uuid") {
             rawQuery += "hex(`uuid`) AS `uuid`, ";
             continue;
-        }
+        }*/
 
-        rawQuery += "`" + i +"`, ";
-    }
-    if(rawQuery.length != 7) {
-        rawQuery = rawQuery.substring(0, rawQuery.length - 2) + " ";
-    } else {
-        rawQuery += " * ";
+        rawQuery += "`" + i +"`=?, ";
     }
 
-    rawQuery += "FROM `" + query.table + "` ";
+    rawQuery = rawQuery.substring(0, rawQuery.length - 2) + " ";
 
     if(query.conditions instanceof Array) {
         rawQuery += "WHERE ";
@@ -43,8 +40,22 @@ function SelectQuery(ctx, query) {
     this.rawQuery = rawQuery;
 }
 
-SelectQuery.prototype.execute = function (ctx, node, args, callback) {
+UpdateQuery.prototype.execute = function (ctx, node, args, callback) {
     var rawArgs = [];
+
+    for(var i in this.query.columns) {
+        var column = this.query.columns[i];
+        if(column instanceof DBParam) {
+            var param = column;
+            for (var p in param._param) {
+                rawArgs.push(ctx.param.get(param._param[p][0], param._param[p][1]));
+            }
+        } else if(typeof column == "function") {
+            rawArgs.push(column(ctx, args));
+        } else {
+            rawArgs.push(args[column]);
+        }
+    }
 
     if(this.query.conditions instanceof Array) {
         for(var i in this.query.conditions) {
@@ -60,7 +71,6 @@ SelectQuery.prototype.execute = function (ctx, node, args, callback) {
                     rawArgs.push(condition.var(ctx, args));
                 } else {
                     rawArgs.push(args[condition.var]);
-                    //rawArgs.push(condition.column == 'uuid' ? "x'" + +args[condition.var]+"" : args[condition.var]);
                 }
             }
         }
@@ -69,4 +79,4 @@ SelectQuery.prototype.execute = function (ctx, node, args, callback) {
     node.rawQuery(ctx, this.rawQuery, rawArgs, callback);
 }
 
-module.exports = SelectQuery;
+module.exports = UpdateQuery;

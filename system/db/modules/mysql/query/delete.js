@@ -15,6 +15,10 @@ function DeleteQuery(ctx, query) {
                 for(var p in paramColumns)
                     rawQuery += "`" + p + "`=? and ";
             } else if(condition.oper == "equal") {
+                if(condition.column == 'uuid') {
+                    rawQuery += "`" + condition.column + "`=x? and ";
+                    continue;
+                }
                 rawQuery += "`" + condition.column + "`=? and ";
             }
         }
