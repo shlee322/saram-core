@@ -7,4 +7,3 @@ module.exports = moduleSys.init({
     actions:require('./actions.js'),
     pipes:require('./pipes.js')
 });
-

@@ -79,16 +79,11 @@ module.exports = {
         var id = ctx.req.query.fb_id;
         ctx.errorTry(!id, Error); // 'fbid.notfound'
 
-        var table = ctx.current.module.config.name;
-        var hash = XXHash.hash(new Buffer(id), 0x654C6162).toString(16);
+        DB.execute(ctx, 'facebook.getUUID', { fb_id:id }, function (err, rows) {
+            ctx.errorTry(err, err);
+            ctx.errorTry(rows.length < 1, Error); //'user.notfound'
 
-        DB.rawQuery(ctx, hash, function (db) {
-            db.rawQuery(ctx, "SELECT hex(`uid`) AS `uid` FROM `" + table + "` WHERE `fb_id`=?", [id], function(err, rows) {
-                ctx.errorTry(err, err);
-                ctx.errorTry(rows.length < 1, Error); //'user.notfound'
-
-                ctx.res.send({uuid:rows[0].uuid});
-            });
+            ctx.res.send({uuid:rows[0].uuid});
         });
     }
 };
