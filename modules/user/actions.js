@@ -1,63 +1,62 @@
+var crypto = require('crypto');
+var Cache = require('../../system/cache/index');
+
+var UUID_REG = /^[0-9A-Fa-f]+$/;
+
 module.exports = {
-    uuidWeld: function(ctx, step) {
+    uuidWeld: function(ctx) {
         var uuid = ctx.req.param.uuid;
-        if(uuid == "my") {
+        if(uuid == "my")
             uuid = ctx.auth;
-        }
-        if(!uuid.match(/^[0-9A-Fa-f]+$/)) {
+
+        if(!uuid.match(UUID_REG))
             uuid = null;
-        }
-        ctx.current.module.errorTry(!uuid, 'uuid.notfound');
+
+        ctx.errorTry(!uuid, Error);
+
         ctx.param.set(ctx.current.module.getMid(), "uuid", uuid);
     },
-    signin: function(ctx, step) {
-        if(ctx.req.sender.type != "server") {
-            throw ctx.current.module.error('perm.notserver');
-        }
+    signin: function(ctx) {
+        ctx.errorTry(ctx.req.sender.type != "server", Error);
+        ctx.current.authNext = false;
+        ctx.req.data.readKey(["uuid"], function() {
+            var uuid = ctx.req.data.getValue("uuid");
 
-        var uuid = ctx.req.body.uuid;
+            ctx.getSaram().uuid.generate(function (uuid) {
+                crypto.randomBytes(48, function(ex, buf) {
+                    var token = uuid + buf.toString('hex');
 
-        ctx.saram.generateUID(function (uid) {
-            require('crypto').randomBytes(48, function(ex, buf) {
-                var token = uid + buf.toString('hex');
-
-                var key = ctx.current.module.getMid() + "_token_" + token;
-                ctx.saram.cache.set(key, uuid, function() {
-                    ctx.res.send({access_token:token});
-                    step();
+                    var key = ctx.current.module.getMid() + "_token_" + token;
+                    Cache.set(ctx, key, uuid, function() {
+                        ctx.res.send({access_token:token});
+                        ctx.current.next();
+                    });
                 });
             });
         });
-        return null;
     },
-    my_uuid : function(ctx, step) {
-        ctx.current.module.errorTry(!ctx.auth, 'uuid.notfound');
+    my_uuid : function(ctx) {
+        ctx.errorTry(!ctx.auth, Error); // 'uuid.notfound'
         ctx.res.send({uuid:ctx.auth});
     },
-    auth: function(ctx, step) {
-        if(!ctx.req.query.access_token) {
+    auth: function(ctx) {
+        if(!ctx.req.query.access_token)
             return;
-        }
+
+        ctx.current.authNext = false;
 
         var key = ctx.current.module.getMid() + "_token_" + ctx.req.query.access_token;
-        ctx.saram.cache.get(key, function(uuid) {
-            if(!uuid) {
-                throw ctx.current.module.error('auth.token.expired');
-            }
-            ctx.auth = uuid;
-            step();
-        });
+        Cache.get(ctx, key, function(uuid) {
+            ctx.errorTry(!uuid, Error); // auth.token.expired
 
-        return null;
+            ctx.auth = uuid;
+            ctx.current.next();
+        });
     },
-    myonly: function(ctx, step) {
-        if(ctx.param.get(ctx.current.module.getMid(), "uuid") != ctx.auth && ctx.req.sender.type != "server") {
-            throw ctx.current.module.error('perm.myonly');
-        }
+    myonly: function(ctx) {
+        ctx.errorTry(ctx.param.get(ctx.current.module.getMid(), "uuid") != ctx.auth && ctx.req.sender.type != "server", Error); // perm.myonly
     },
-    useAuth: function(ctx, step) {
-        if(!ctx.req.auth) {
-            throw ctx.current.module.error('perm.notUseAuth');
-        }
+    useAuth: function(ctx) {
+        ctx.errorTry(!ctx.req.auth, Error); // 'perm.notUseAuth'
     }
 }

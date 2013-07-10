@@ -4,7 +4,7 @@
 */
 
 module.exports = [
-    {type:"WELD", name:"root", url:"/:uuid/", action:"uuidWeld"},
-    {type:"POST", url:"/signin", action:"signin"},
-    {type:"GET", url:"/my_uuid", action:"my_uuid"}
+    {type:"WELD", name:"root", url:"/:uuid/", viewer:"uuidWeld"},
+    {type:"POST", url:"/signin", viewer:"signin"},
+    {type:"GET", url:"/my_uuid", viewer:"my_uuid"}
 ];
