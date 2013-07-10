@@ -1,5 +1,6 @@
 var url = require('url');
 var querystring = require('querystring');
+var fs = require('fs');
 var Response = require('../../../context/response.js');
 
 var SERVER = "saram.elab.kr/" + require('../../../../package.json').version;
@@ -15,6 +16,17 @@ HttpResponse.prototype.send = function (data, type) {
         type = "application/json; charset=utf-8";
 
     this._raw.writeHead(200, {"Server":SERVER, "Content-Type": type});
+    if(data instanceof fs.ReadStream) {
+        var _this = this;
+        data.on("data",function(d){
+            _this._raw.write(d, 'binary');
+        });
+        data.on("end",function(){
+            _this._raw.end();
+        });
+
+        return;
+    }
     this._raw.end(data);
 }
 
