@@ -38,12 +38,9 @@ function routine(ctx, pipeline) {
         ctx.req.param[nowPipe.pipe.rawPath.param[index-1]] = nowPipe.match[index];
     }
 
-    var viewer = nowPipe.pipe.viewer;
-    viewer.setResponse(ctx, function (res) {
-        Call.callAction(ctx, nowPipe.module, viewer.getAction(), function (){
-            ctx.res = res;
-            routine(ctx, pipeline);
-        });
+
+    Call.callAction(ctx, nowPipe.module, nowPipe.pipe.viewer, function (){
+        routine(ctx, pipeline);
     });
 }
 

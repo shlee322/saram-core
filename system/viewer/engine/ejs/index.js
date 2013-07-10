@@ -15,7 +15,7 @@ EjsEngine.prototype.setResponse = function (ctx, func) {
     var viewer = this._viewer[ctx.current.module.getSkin()];
 
     if(!viewer) {
-        var data = fs.readFileSync(ctx.current.module.getSkin() + "/" + this.file);
+        var data = fs.readFileSync(ctx.current.module.getSkin() + "/" + this.file, 'utf8');
         viewer = ejs.compile(data);
         this._viewer[ctx.current.module.getSkin()] = viewer;
     }

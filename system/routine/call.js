@@ -1,3 +1,5 @@
+var Engine = require('../viewer/engine.js');
+
 /**
  * 이벤트를 호출하는 함수
  * 이 함수가 호출되면 리시버에게 이벤트가 호출됬다는 것을 알림
@@ -44,21 +46,41 @@ exports.callReceiver = function (ctx, receiverList, callback) {
  * @param ctx Context
  * @param step Call Next Step Function
  */
-exports.callAction = function (ctx, module, actionName, next) {
-    exports.callEvent(ctx, module, "call." + actionName +".before", function() {
+exports.callAction = function (ctx, module, action, next) {
+    var viewer = action;
+    if(viewer instanceof Engine) {
+        action = viewer.getAction();
+    } else {
+        viewer = null;
+    }
+
+    exports.callEvent(ctx, module, "call." + action +".before", function() {
         var after = function() {
-            exports.callEvent(ctx, module, "call." + actionName +".after", function() {
+            exports.callEvent(ctx, module, "call." + action +".after", function() {
                 next();
             });
         }
 
-        var actionFunc = module.actions[actionName];
+        var actionFunc = module.actions[action];
         //ctx.before = ctx.current;
-        ctx.current = {module:module, action:actionName, autoNext:true, next:after};
+        ctx.current = {module:module, action:action, autoNext:true, next:after};
 
-        actionFunc(ctx);
-        if( ctx.current.autoNext ) {
-            next();
+        if(viewer) {
+            viewer.setResponse(ctx, function (res) {
+                _callActionRoutine(ctx, actionFunc, function() {
+                    ctx.res = res;
+                    next();
+                });
+            });
+        } else {
+            _callActionRoutine(ctx, actionFunc, next);
         }
     });
+}
+
+function _callActionRoutine(ctx, actionFunc, nextFunc) {
+    actionFunc(ctx);
+    if( ctx.current.autoNext ) {
+        nextFunc();
+    }
 }

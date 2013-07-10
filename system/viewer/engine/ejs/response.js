@@ -1,4 +1,5 @@
 var Response = require('../../../context/response.js');
+var HttpResponse = require('../../../protocol/modules/http/response.js');
 
 function EjsRespone(res, viewer) {
     Response.apply(this);
@@ -7,7 +8,13 @@ function EjsRespone(res, viewer) {
 }
 
 EjsRespone.prototype.send = function (data) {
-    this._raw.send(this._viewer(data));
+    var html = this._viewer(data);
+
+    if(this._raw instanceof HttpResponse) {
+        this._raw.send(html, "text/html");
+        return;
+    }
+    this._raw.send(html);
 }
 
 EjsRespone.prototype.error = function (data) {

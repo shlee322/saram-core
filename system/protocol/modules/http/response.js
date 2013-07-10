@@ -10,13 +10,19 @@ function HttpResponse(res) {
     this._raw = res;
 }
 
-HttpResponse.prototype.send = function (data) {
-    this._raw.writeHead(200, {"Server":SERVER, "Content-Type": "application/json; charset=utf-8"});
+HttpResponse.prototype.send = function (data, type) {
+    if(!type)
+        type = "application/json; charset=utf-8";
+
+    this._raw.writeHead(200, {"Server":SERVER, "Content-Type": type});
     this._raw.end(data);
 }
 
-HttpResponse.prototype.error = function (data) {
-    this._raw.writeHead(501, {"Server":SERVER, "Content-Type": "application/json; charset=utf-8"});
+HttpResponse.prototype.error = function (data, type) {
+    if(!type)
+        type = "application/json; charset=utf-8";
+
+    this._raw.writeHead(501, {"Server":SERVER, "Content-Type": type});
     this._raw.end(typeof data == "string" ? data : JSON.stringify({error:{mid:data.mid, code:data.code, message:data.message, stack:data.stack}}));
 }
 
