@@ -1,5 +1,5 @@
 module.exports = [
-    {type:"GET", name:"boxlist", url:"/:uid/box/list", action:"boxlist"},
-    {type:"WELD", name:"root", url:"/:uid/", action:"weld"},
-    {type:"POST", name:"addFollowing", url:"/add_following", action:"addFollowing"}
+    {type:"GET", name:"boxlist", url:"/:uuid/box/list", viewer:"boxlist"},
+    {type:"WELD", name:"root", url:"/:uuid/", viewer:"weld"},
+    {type:"POST", name:"addFollowing", url:"/add_following", viewer:"addFollowing"}
 ]
