@@ -11,7 +11,7 @@ function EjsEngine(action, file) {
     this._viewer = {};
 }
 
-EjsEngine.prototype.prototype.setResponse = function (ctx, func) {
+EjsEngine.prototype.setResponse = function (ctx, func) {
     var viewer = this._viewer[ctx.current.module.getSkin()];
 
     if(!viewer) {
