@@ -60,5 +60,4 @@ UpsertQuery.prototype.addArgs = function (ctx, rawArgs, column, args) {
     }
 }
 
-
 module.exports = UpsertQuery;

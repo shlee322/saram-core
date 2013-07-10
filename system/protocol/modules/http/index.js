@@ -14,3 +14,4 @@ HttpProtocol.prototype.start = function () {
 }
 
 module.exports = HttpProtocol;
+

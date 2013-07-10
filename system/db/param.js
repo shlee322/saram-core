@@ -42,6 +42,4 @@ DBParam.prototype.getIndex = function (name, lastIndex) {
     return {name:name, type:this.indexType, columns:paramIndex};
 }
 
-
-
 module.exports = DBParam;
