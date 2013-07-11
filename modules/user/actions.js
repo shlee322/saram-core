@@ -7,7 +7,7 @@ module.exports = {
     uuidWeld: function(ctx) {
         var uuid = ctx.req.param.uuid;
         if(uuid == "my")
-            uuid = ctx.auth;
+            uuid = ctx[ctx.current.module.config.var];
 
         if(!uuid.match(UUID_REG))
             uuid = null;
@@ -18,6 +18,9 @@ module.exports = {
     },
     signin: function(ctx) {
         ctx.errorTry(ctx.req.sender.type != "server", Error);
+
+        var tokenVar = ctx.current.module.config.token;
+
         ctx.current.authNext = false;
         ctx.req.data.readKey(["uuid"], function() {
             var uuid = ctx.req.data.getValue("uuid");
@@ -28,7 +31,9 @@ module.exports = {
 
                     var key = ctx.current.module.getMid() + "_token_" + token;
                     Cache.set(ctx, key, uuid, function() {
-                        ctx.res.send({access_token:token});
+                        var obj = {};
+                        obj[tokenVar] = token;
+                        ctx.res.send(obj);
                         ctx.current.next();
                     });
                 });
@@ -36,27 +41,32 @@ module.exports = {
         });
     },
     my_uuid : function(ctx) {
-        ctx.errorTry(!ctx.auth, Error); // 'uuid.notfound'
-        ctx.res.send({uuid:ctx.auth});
+        var authVar = ctx.current.module.config.var;
+        ctx.errorTry(!ctx[authVar], Error); // 'uuid.notfound'
+        ctx.res.send({uuid:ctx[authVar]});
     },
     auth: function(ctx) {
-        if(!ctx.req.query.access_token)
+        var authVar = ctx.current.module.config.var;
+        var token = ctx.req.query[ctx.current.module.config.token];
+        if(!token)
             return;
 
         ctx.current.authNext = false;
 
-        var key = ctx.current.module.getMid() + "_token_" + ctx.req.query.access_token;
+        var key = ctx.current.module.getMid() + "_token_" + token;
         Cache.get(ctx, key, function(uuid) {
             ctx.errorTry(!uuid, Error); // auth.token.expired
 
-            ctx.auth = uuid;
+            ctx[authVar] = uuid;
             ctx.current.next();
         });
     },
     myonly: function(ctx) {
-        ctx.errorTry(ctx.param.get(ctx.current.module.getMid(), "uuid") != ctx.auth && ctx.req.sender.type != "server", Error); // perm.myonly
+        var authVar = ctx.current.module.config.var;
+        ctx.errorTry(ctx.param.get(ctx.current.module.getMid(), "uuid") != ctx[authVar] && ctx.req.sender.type != "server", Error); // perm.myonly
     },
     useAuth: function(ctx) {
-        ctx.errorTry(!ctx.req.auth, Error); // 'perm.notUseAuth'
+        var authVar = ctx.current.module.config.var;
+        ctx.errorTry(!ctx[authVar], Error); // 'perm.notUseAuth'
     }
 }
