@@ -5,12 +5,12 @@ function JsonRespone(res) {
     this._raw = res;
 }
 
-JsonRespone.prototype.send = function (data) {
-    this._raw.send(JSON.stringify(data));
+JsonRespone.prototype.send = function (data, header) {
+    this._raw.send(JSON.stringify(data), header);
 }
 
-JsonRespone.prototype.error = function (data) {
-    this._raw.error(JSON.stringify({error:{mid:data.mid, code:data.code, message:data.message, stack:data.stack}}));
+JsonRespone.prototype.error = function (data, header) {
+    this._raw.error(data, header);
 }
 
 JsonRespone.prototype.__proto__ = Response.prototype;

@@ -1,6 +1,7 @@
 var fs = require('fs');
 var path = require('path');
 var Response = require('../../../context/response.js');
+var Header = require('../../../context/header.js');
 var mime = require('./mime.json');
 
 function FileRespone(res) {
@@ -8,16 +9,17 @@ function FileRespone(res) {
     this._raw = res;
 }
 
-FileRespone.prototype.send = function (file) {
+FileRespone.prototype.send = function (file, header) {
+    if(!header)
+        header = new Header.Header();
     var ex = path.extname(file);
     var type = mime[ex];
-    if(!mime[ex])
-        type = 'application/octet-stream';
-    this._raw.send(fs.createReadStream(file), type);
+    header.set(Header.Key.CONTENT_TYPE, type ? type : 'application/octet-stream');
+    this._raw.send(fs.createReadStream(file), header);
 }
 
-FileRespone.prototype.error = function (data) {
-    this._raw.error(JSON.stringify({error:{mid:data.mid, code:data.code, message:data.message, stack:data.stack}}));
+FileRespone.prototype.error = function (data, header) {
+    this._raw.error(data, header);
 }
 
 FileRespone.prototype.__proto__ = Response.prototype;

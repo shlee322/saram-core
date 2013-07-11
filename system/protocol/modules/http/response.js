@@ -2,6 +2,7 @@ var url = require('url');
 var querystring = require('querystring');
 var fs = require('fs');
 var Response = require('../../../context/response.js');
+var Header = require('../../../context/header.js');
 
 var SERVER = "saram.elab.kr/" + require('../../../../package.json').version;
 
@@ -11,11 +12,18 @@ function HttpResponse(res) {
     this._raw = res;
 }
 
-HttpResponse.prototype.send = function (data, type) {
-    if(!type)
-        type = "application/json; charset=utf-8";
+HttpResponse.prototype.send = function (data, header) {
+    if(!header)
+        header = new Header.Header();
 
-    this._raw.writeHead(200, {"Server":SERVER, "Content-Type": type});
+    this._raw.writeHead(
+        header.get(Header.Key.RESPONSE_CODE, 200),
+        {
+            "Server":SERVER,
+            "Content-Type": header.get(Header.Key.CONTENT_TYPE, 'application/json; charset=utf-8;')
+        }
+    );
+
     if(data instanceof fs.ReadStream) {
         var _this = this;
         data.on("data",function(d){
@@ -27,14 +35,21 @@ HttpResponse.prototype.send = function (data, type) {
 
         return;
     }
+
     this._raw.end(data);
 }
 
-HttpResponse.prototype.error = function (data, type) {
-    if(!type)
-        type = "application/json; charset=utf-8";
+HttpResponse.prototype.error = function (data, header) {
+    if(!header)
+        header = new Header.Header();
 
-    this._raw.writeHead(501, {"Server":SERVER, "Content-Type": type});
+    this._raw.writeHead(
+        header.get(Header.Key.RESPONSE_CODE, 501),
+        {
+            "Server":SERVER,
+            "Content-Type": header.get(Header.Key.CONTENT_TYPE, 'application/json; charset=utf-8;')
+        }
+    );
     this._raw.end(typeof data == "string" ? data : JSON.stringify({error:{mid:data.mid, code:data.code, message:data.message, stack:data.stack}}));
 }
 

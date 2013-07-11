@@ -1,4 +1,5 @@
 var Response = require('../../../context/response.js');
+var Header = require('../../../context/header.js');
 var HttpResponse = require('../../../protocol/modules/http/response.js');
 
 function EjsRespone(res, viewer) {
@@ -7,18 +8,18 @@ function EjsRespone(res, viewer) {
     this._raw = res;
 }
 
-EjsRespone.prototype.send = function (data) {
+EjsRespone.prototype.send = function (data, header) {
     var html = this._viewer(data);
 
     if(this._raw instanceof HttpResponse) {
-        this._raw.send(html, "text/html");
+        this._raw.send(html, new Header.Header([[Header.Key.CONTENT_TYPE, "text/html"]]));
         return;
     }
-    this._raw.send(html);
+    this._raw.send(html, header);
 }
 
-EjsRespone.prototype.error = function (data) {
-    this._raw.error(JSON.stringify({error:{mid:data.mid, code:data.code, message:data.message, stack:data.stack}}));
+EjsRespone.prototype.error = function (data, header) {
+    this._raw.error(data, header);
 }
 
 EjsRespone.prototype.__proto__ = Response.prototype;

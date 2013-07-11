@@ -1,11 +1,12 @@
 function Response() {
 }
 
-Response.prototype.error = function (error) {
+Response.prototype.send = function (data, header) {
+}
+
+Response.prototype.error = function (error, header) {
     throw error;
 }
 
-Response.prototype.send = function (obj) {
-}
 
 module.exports = Response;
