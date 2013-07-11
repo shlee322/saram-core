@@ -22,6 +22,20 @@ function Kernel (arg) {
     this.modules.load(require('./module/content.js'));
     this.modules.use('saram.core', 'saram.core');
     this._coreModule = this.modules.get('saram.core');
+
+    //Load Assets Module
+    this.modules.load(require('../../modules/static/index.js'));
+    this.modules.use('elab.static', 'assets');
+    this.modules.weld('assets', 'assets');
+    this._assets = this.modules.get('assets');
+
+    //Load Manager Module
+    if(arg.manager) {
+        this.modules.load(require('../../modules/manager/index.js'));
+        this.modules.use('elab.manager', 'elab.manager');
+        this.manager = this.modules.get('elab.manager');
+        this.modules.weld('elab.manager', arg.manager);
+    }
 }
 
 /**
@@ -37,6 +51,10 @@ Kernel.prototype.start = function () {
  */
 Kernel.prototype.getCoreModule = function () {
     return this._coreModule;
+}
+
+Kernel.prototype.getAssets = function () {
+    return this._assets;
 }
 
 module.exports = Kernel;

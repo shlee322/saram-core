@@ -9,6 +9,7 @@ function checkObject(arg) {
     check(arg, 'db', [String], 'db.json');
     check(arg, 'node', [String], 'node.json');
     check(arg, 'cluster', [String], 'cluster.json');
+    check(arg, 'manager', [String], null);
 }
 
 function check(arg, key, type, value){

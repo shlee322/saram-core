@@ -1,7 +1,23 @@
 var path = require('path');
 var fs = require('fs');
+var os = require("os");
 
 var actions = {
+    main:function(ctx) {
+        var data = {};
+        data.cpus = [];
+
+        var cpus = os.cpus();
+        for(var i = 0, len = cpus.length; i < len; i++) {
+            var cpu = cpus[i];
+            var total = 0;
+            for(var type in cpu.times)
+                total += cpu.times[type];
+            data.cpus[i] = 100 - Math.round(100 * cpu.times['idle'] / total);
+        }
+        ctx.res.send(data);
+    }
+    /*
     main:function(ctx, next) {
         ctx.res.send({});
     },
@@ -31,13 +47,13 @@ var actions = {
         });
 
         return false;
-    }
+    }*/
 };
 
-require('./modules/actions.js')(actions);
+//require('./modules/actions.js')(actions);
 
 module.exports = actions;
-
+     /*
 function getModuleInfo(path) {
     if(path == "index.js") {
         return ;
@@ -75,4 +91,4 @@ function generateWeldTree(bundle) {
     }
 
     return tree;
-}
+}        */
