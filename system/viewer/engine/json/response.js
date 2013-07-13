@@ -6,7 +6,7 @@ function JsonRespone(res) {
 }
 
 JsonRespone.prototype.send = function (data, header) {
-    this._raw.send(JSON.stringify(data), header);
+    this._raw.send(data, header);
 }
 
 JsonRespone.prototype.error = function (data, header) {

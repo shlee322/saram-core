@@ -1,4 +1,4 @@
-function Response() {
+function Response(ctx) {
 }
 
 Response.prototype.send = function (data, header) {

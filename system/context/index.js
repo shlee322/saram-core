@@ -15,8 +15,8 @@ function Context(saram) {
     this.param = new Param();
     this.current = {};
 
-    this.req = new Request();
-    this.res = new Response();
+    this.req = new Request(this);
+    this.res = new Response(this);
 }
 
 Context.prototype.getSaram = function () {

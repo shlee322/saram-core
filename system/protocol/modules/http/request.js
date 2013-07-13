@@ -3,8 +3,8 @@ var querystring = require('querystring');
 var Request = require('../../../context/request.js');
 var HttpData = require('./data.js');
 
-function HttpRequest(req) {
-    Request.apply(this);
+function HttpRequest(ctx, req) {
+    Request.apply(this, [ctx]);
 
     var method = req.method.toLowerCase();
     if(method != "get" && method != "post" && method != "put" && method != "delete")
@@ -16,7 +16,7 @@ function HttpRequest(req) {
     this.url = url.parse(req.url, true);
     this.query = this.url.query;
     this.path = this.url.pathname;
-    this.data = new HttpData(this._raw);
+    this.data = new HttpData(ctx, this._raw);
 }
 
 HttpRequest.prototype.__proto__ = Request.prototype;

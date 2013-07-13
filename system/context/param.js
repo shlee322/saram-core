@@ -1,5 +1,12 @@
-function Param() {
+function Param(data) {
     this._data = {};
+
+    if(data) {
+        for(var i in data) {
+            var d = data[i];
+            this.set(d[0], d[1], d[2]);
+        }
+    }
 }
 
 Param.prototype.set = function(mid, key, value) {

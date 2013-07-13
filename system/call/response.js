@@ -1,7 +1,7 @@
 var Response = require('../context/response.js');
 
-function CallResponse(pernet, callback) {
-    Response.apply(this);
+function CallResponse(ctx, pernet, callback) {
+    Response.apply(this, [ctx]);
 
     this._pernet = pernet;
     this._callback = callback;

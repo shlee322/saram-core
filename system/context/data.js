@@ -1,5 +1,5 @@
 //비동기 데이터 수신 등에 사용
-function RequestData () {
+function RequestData (ctx) {
 }
 
 RequestData.prototype.readKey = function (keys, callback) {

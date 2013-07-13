@@ -7,8 +7,8 @@ var ResponseCode = require('./responsecode.js');
 
 var SERVER = "saram.elab.kr/" + require('../../../../package.json').version;
 
-function HttpResponse(res) {
-    Response.apply(this);
+function HttpResponse(ctx, res) {
+    Response.apply(this, [ctx]);
 
     this._raw = res;
 }

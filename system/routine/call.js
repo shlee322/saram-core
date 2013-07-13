@@ -79,8 +79,10 @@ exports.callAction = function (ctx, module, action, next) {
 }
 
 function _callActionRoutine(ctx, actionFunc, nextFunc) {
-    actionFunc(ctx);
-    if( ctx.current.autoNext ) {
-        nextFunc();
-    }
+    ctx.run(function() {
+        actionFunc(ctx);
+        if( ctx.current.autoNext ) {
+            nextFunc();
+        }
+    });
 }

@@ -1,24 +1,26 @@
 var querystring = require('querystring');
 var Data = require('../../../context/data.js');
 
-function HttpData(req) {
-    Data.apply(this);
+function HttpData(ctx, req) {
+    Data.apply(this, [ctx]);
 
+    this._ctx = ctx;
     this._req = req;
-    this._data = "";
-
 }
 
 HttpData.prototype.readKeyRoutine = function (keys, callback) {
     var _this = this;
 
+    var data = "";
+
     this._req.on('data', function (chunk) {
-        _this._data += chunk;
+        data += chunk.toString('utf8');
     });
 
     this._req.on('end', function () {
-        _this._data = querystring.parse(_this._data);
-        callback();
+        data = querystring.parse(data);
+        _this._data = data;
+        _this._ctx.run(callback);
     });
 }
 

@@ -7,7 +7,7 @@ function CallContext (pernet, method, path, data, callback) {
     pernet.setChild(this);
 
     this.req = new CallRequest(this, method, path, data);
-    this.res = new CallResponse(pernet, callback);
+    this.res = new CallResponse(this, pernet, callback);
 }
 
 CallContext.prototype.__proto__ = Context.prototype;

@@ -1,15 +1,16 @@
 var querystring = require('querystring');
 var Data = require('../context/data.js');
 
-function CallData(data) {
-    Data.apply(this);
+function CallData(ctx, data) {
+    Data.apply(this, [ctx]);
 
+    this._ctx = ctx;
     this._data = data;
 
 }
 
 CallData.prototype.readKeyRoutine = function (keys, callback) {
-    callback();
+    this._ctx.run(callback);
 }
 
 CallData.prototype.getValue = function (key, defaultValue) {
