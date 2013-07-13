@@ -13,7 +13,7 @@ function DeleteQuery(ctx, query) {
             if(condition.oper == "param") {
                 var paramColumns = condition.param.getColumns();
                 for(var p in paramColumns)
-                    rawQuery += "`" + p + "`=? and ";
+                    rawQuery += "`" + p + "`=x? and ";
             } else if(condition.oper == "equal") {
                 if(condition.column == 'uuid') {
                     rawQuery += "`" + condition.column + "`=x? and ";

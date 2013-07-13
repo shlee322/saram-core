@@ -8,11 +8,11 @@ function UpsertQuery(ctx, query) {
     this._rawQuery1 = "INSERT INTO `" + query.table + "` VALUE(0x";
     this._rawQuery2 = "";
 
-    for(var i in this.table.columns) {
-        if(this.table.columns[i] instanceof DBParam) {
-            var param = this.table.columns[i].getColumns();
+    for(var i in this.query.columns) {
+        if(this.query.columns[i] instanceof DBParam) {
+            var param = this.query.columns[i].getColumns();
             for(var p in param)
-                this._rawQuery2 += ", ?";
+                this._rawQuery2 += ", x?";
             continue;
         }
         this._rawQuery2 += ", ?";
