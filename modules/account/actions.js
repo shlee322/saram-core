@@ -45,15 +45,13 @@ module.exports = {
 
         ctx.errorTry(ctx.req.sender.type != "server", Error); // 'perm.notserver'
 
-        ctx.req.data.readKey(["id"], function() {
-            var id = ctx.req.data.getValue("id");
+        var id = ctx.req.query.id;
 
-            DB.execute(ctx, 'account.getAccount', { id:id }, function (err, rows) {
-                ctx.errorTry(err, err);
-                ctx.errorTry(rows.length < 1, Error); //'account.notfound'
-                ctx.res.send({uuid:rows[0].uuid});
-                ctx.current.next();
-            });
+        DB.execute(ctx, 'account.getAccount', { id:id }, function (err, rows) {
+            ctx.errorTry(err, err);
+            ctx.errorTry(rows.length < 1, Error); //'account.notfound'
+            ctx.res.send({uuid:rows[0].uuid});
+            ctx.current.next();
         });
     }
 }
