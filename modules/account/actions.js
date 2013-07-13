@@ -32,8 +32,8 @@ module.exports = {
             DB.execute(ctx, 'account.getAccount', { id:id }, function (err, rows) {
                 ctx.errorTry(err, err);
                 ctx.errorTry(rows.length < 1, Error); //'account.notfound'
-                ctx.errorTry(nodeHash.sha256(args.pw) != pw, Error);
-                Call.post(ctx, ctx.current.module.config.userPath + "/signin", { data:{uuid:rows[0].uuid} }, function(obj) {
+                ctx.errorTry(nodeHash.sha256(pw) != rows[0].pw, Error);
+                Call.post(ctx, "/signin", { weld:ctx.current.module.config.userModule, data:{uuid:rows[0].uuid} }, function(obj) {
                     ctx.res.send(obj);
                     _current.next();
                 });

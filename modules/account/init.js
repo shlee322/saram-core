@@ -8,9 +8,10 @@ function initListModule(ctx) {
         _this.config = {};
 
         _this.config.name = ctx.req.data.getValue("name", _this.getMid());
-        _this.config.userPath = ctx.req.data.getValue("userPath");
+        var userModule = ctx.req.data.getValue("user");
+        _this.config.userModule = ctx.getSaram().modules.get(userModule);
 
-        ctx.errorTry(!_this.config.userPath, Error);
+        ctx.errorTry(!_this.config.userModule, Error);
 
         var columns = {};
         columns["id"] = {type:"string", length:64};
@@ -37,7 +38,9 @@ function initListModule(ctx) {
             action : 'select',
             table : _this.config.name,
             columns : {
-                uuid : 'uuid'
+                uuid : 'uuid',
+                id : 'id',
+                pw : 'pw'
             },
             conditions : [
                 { oper:'equal', column:'id', var:'id' }
