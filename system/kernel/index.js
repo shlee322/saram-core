@@ -93,3 +93,14 @@ Kernel.prototype.use = function (name, mid, obj) {
 Kernel.prototype.weld = function (parentMid, childMid, path, weld) {
     return this.modules.weld(parentMid, childMid, path, weld);
 }
+
+/**
+ * @deprecated
+ * @param targetMid
+ * @param event
+ * @param receiver
+ * @param action
+ */
+Kernel.prototype.addReceiver = function (targetMid, event, receiver, action) {
+    this.modules.addReceiver(targetMid, event, receiver, action);
+}

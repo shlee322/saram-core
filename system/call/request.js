@@ -12,10 +12,12 @@ function CallRequest(ctx, method, path, data) {
     this.query = data.query ? data.query : {};
     this.data = new CallData(data.data);
 
-    for(var i in data.param._data) {
-        ctx.param._data[i] = {};
-        for(var key in data.param._data[i]) {
-            ctx.param._data[i][key] = data.param._data[i][key];
+    if(data.param) {
+        for(var i in data.param._data) {
+            ctx.param._data[i] = {};
+            for(var key in data.param._data[i]) {
+                ctx.param._data[i][key] = data.param._data[i][key];
+            }
         }
     }
 }

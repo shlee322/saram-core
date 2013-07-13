@@ -1,3 +1,4 @@
+var Module = require('./index.js');
 var Bundle = require('./bundle.js');
 
 function ModuleObject(content, mid) {
@@ -37,6 +38,25 @@ ModuleObject.prototype.setSkin = function (dir) {
 
 ModuleObject.prototype.getSkin = function () {
     return this._skin;
+}
+
+ModuleObject.prototype.addAction = function (name, func) {
+    this.actions[name] = func;
+}
+
+ModuleObject.prototype.addPipe = function (pipe) {
+    Module.initPipe(pipe);
+    this.pipes.push(pipe);
+    this._bundle.addPipe(pipe);
+}
+
+ModuleObject.prototype.addReceiver = function (event, module, action) {
+    var e = this._event[event];
+    if(!e) {
+        e = [];
+        this._event[event] = e;
+    }
+    e.push({module:module, action:action});
 }
 
 module.exports = ModuleObject;

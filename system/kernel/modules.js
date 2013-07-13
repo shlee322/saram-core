@@ -138,13 +138,7 @@ Modules.prototype.addReceiver = function (targetMid, eventName, receiverMid, act
         receiver = this._saram.getCoreModule();
     }
 
-    var evnets = target._event[eventName];
-    if(!evnets) {
-        events = [];
-        target._event[eventName] = events;
-    }
-
-    events.push({module:receiver, action:action});
+    target.addReceiver(eventName, receiver, action);
 }
 
 module.exports = Modules;

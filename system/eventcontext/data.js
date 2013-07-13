@@ -3,7 +3,7 @@ var Data = require('../context/data.js');
 function EventData(data) {
     Data.apply(this);
 
-    this._data = data;
+    this._data = data ? data : {};
 }
 
 EventData.prototype.readKeyRoutine = function (keys, callback) {
