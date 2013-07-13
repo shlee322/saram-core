@@ -3,6 +3,7 @@ var querystring = require('querystring');
 var fs = require('fs');
 var Response = require('../../../context/response.js');
 var Header = require('../../../context/header.js');
+var ResponseCode = require('./responsecode.js');
 
 var SERVER = "saram.elab.kr/" + require('../../../../package.json').version;
 
@@ -36,12 +37,19 @@ HttpResponse.prototype.send = function (data, header) {
         return;
     }
 
+    if(data instanceof Object) {
+        data = JSON.stringify(data);
+    }
+
     this._raw.end(data);
 }
 
 HttpResponse.prototype.error = function (data, header) {
     if(!header)
         header = new Header.Header();
+
+    if(data instanceof ResponseCode.Response)
+        header.set(Header.Key.RESPONSE_CODE, data.responseCode);
 
     this._raw.writeHead(
         header.get(Header.Key.RESPONSE_CODE, 501),
