@@ -3,7 +3,7 @@ var querystring = require("querystring");
 var XXHash = require('xxhash');
 var DB = require('../../system/db/index.js');
 var Call = require('../../system/call/index.js');
-var HttpResponse = require('../../system/protocol/http/response.js');
+var HttpResponse = require('../../system/protocol/modules/http/response.js');
 
 module.exports = {
     auth: function(ctx) {
@@ -29,7 +29,7 @@ module.exports = {
         }
 
         if(!ctx.req.query.fb_token) {
-            ctx.errorTry(!(ctx.res instanceof HttpResponse), Error); //fbtoken.notfound
+            //ctx.errorTry(!(ctx.res instanceof HttpResponse), Error); //fbtoken.notfound
 
             var redirectUrl = "https://www.facebook.com/dialog/oauth/?" +
                 querystring.stringify({
@@ -37,8 +37,7 @@ module.exports = {
                     redirect_uri: ctx.current.module.uri + "/auth",
                     state: ctx.current.module.state
                 });
-            ctx.res.raw.obj.writeHead(200, {"Content-Type": "text/html"});
-            ctx.res.raw.obj.end("<meta http-equiv='refresh' content='0;url=" + redirectUrl + "'>");
+            ctx.res.send("<meta http-equiv='refresh' content='0;url=" + redirectUrl + "'>");
 
             return;
         }
@@ -54,7 +53,7 @@ module.exports = {
 
                 if(rows.length < 1)  {
                     DB.execute(ctx, 'facebook.register', { fb_id:id }, function (err, rows) {
-                        Call.post(ctx, ctx.current.module.config.userPath + "/signin", {data:{uuid:rows.uuid}}, function(obj) {
+                        Call.post(ctx, "/signin", {weld:ctx.current.module.config.userModule, data:{uuid:rows.uuid}}, function(obj) {
                             ctx.res.send(obj);
                             ctx.current.next();
                         });
@@ -62,18 +61,17 @@ module.exports = {
                     return;
                 }
 
-                Call.post(ctx, ctx.current.module.config.userPath + "/signin", {data:{uuid:rows[0].uuid}}, function(obj) {
+                Call.post(ctx, "/signin", {weld:ctx.current.module.config.userModule, data:{uuid:rows[0].uuid}}, function(obj) {
                     ctx.res.send(obj);
                     ctx.current.next();
                 });
-
             });
         });
 
         ctx.current.authNext = false;
     },
 
-    getUUID: function(ctx, step) {
+    getUUID: function(ctx) {
         ctx.errorTry(ctx.req.sender.type != "server", Error); // 'perm.notserver'
 
         var id = ctx.req.query.fb_id;
