@@ -10,13 +10,14 @@ module.exports = {
     },
     addFollowing:function(ctx) {
         ctx.req.data.readKey(["object", "target"], function() {
+            var module = ctx.current.module;
             var object = ctx.req.data.getValue("object");
             var target = ctx.req.data.getValue("target");
 
-            Call.post(ctx, "/" + object + "/following/", null, {value:target}, function(obj) {
-            }, ctx.current.module.getMid());
-            Call.post(ctx, "/" + target + "/follower/", null, {value:object}, function(obj) {
-            }, ctx.current.module.getMid());
+            Call.post(ctx, "/" + object + "/following/", {weld:module, data:{value:target}}, function(obj) {
+            });
+            Call.post(ctx, "/" + target + "/follower/", {weld:module, data:{value:object}}, function(obj) {
+            });
             ctx.res.send({state:'OK'});
         });
     },
@@ -25,7 +26,7 @@ module.exports = {
         var object = ctx.req.param.uuid;
         ctx.errorTry(!object.match(UUID_Reg), Error); // 'notuuid'
 
-        Call.get(ctx, "/" + object + "/follower/", null, function(obj) {
+        Call.get(ctx, "/" + object + "/follower/", {weld:ctx.current.module, query:{}}, function(obj) {
             ctx.errorTry(obj.error, Error);
 
             var list = [];
@@ -34,6 +35,6 @@ module.exports = {
             }
             list.push(object);
             ctx.res.send({target:list});
-        }, ctx.current.module.getMid());
+        });
     }
 }
