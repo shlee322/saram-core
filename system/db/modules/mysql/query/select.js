@@ -10,7 +10,7 @@ function SelectQuery(ctx, query) {
             continue;
         }
 
-        rawQuery += "`" + i +"`, ";
+        rawQuery += "`" + i +"` AS `" + query.columns[i] + "`, ";
     }
     if(rawQuery.length != 7) {
         rawQuery = rawQuery.substring(0, rawQuery.length - 2) + " ";
