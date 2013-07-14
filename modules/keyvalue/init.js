@@ -31,6 +31,7 @@ function initKeyValueModule(ctx) {
             table : _this.config.name,
             columns : {
                 uuid : 'uuid',
+                str : 'key',
                 value : 'value'
             },
             conditions : [
@@ -44,6 +45,7 @@ function initKeyValueModule(ctx) {
             table : _this.config.name,
             columns : {
                 uuid : 'uuid',
+                str : 'key',
                 value : 'value'
             },
             conditions : [
