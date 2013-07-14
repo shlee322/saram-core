@@ -24,10 +24,9 @@ module.exports = {
         ctx.current.authNext = false;
         ctx.req.data.readKey(["uuid"], function() {
             var uuid = ctx.req.data.getValue("uuid");
-
-            ctx.getSaram().uuid.generate(function (uuid) {
+            ctx.getSaram().uuid.generate(function (token) {
                 crypto.randomBytes(48, function(ex, buf) {
-                    var token = uuid + buf.toString('hex');
+                    token = token + buf.toString('hex');
 
                     var key = ctx.current.module.getMid() + "_token_" + token;
                     Cache.set(ctx, key, uuid, function() {
