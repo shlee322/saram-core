@@ -1,3 +1,4 @@
+var XXHash = require('xxhash');
 var DB = require('../../system/db/index.js');
 var DBParam = require('../../system/db/param.js');
 
@@ -16,9 +17,10 @@ function initListModule(ctx) {
         DB.setTable(ctx, {
             name : _this.config.name,
             columns : param.getColumns({
+                'key' : 'int64',
                 'value' : {type:"string", length:256}
             }),
-            indexes : [param.getIndex("key")]
+            indexes : [param.getIndex("key", [["key", "ASC"]])]
         });
 
         DB.setQuery(ctx, {
@@ -39,6 +41,7 @@ function initListModule(ctx) {
             table : _this.config.name,
             columns : {
                 param : param,
+                key : function(ctx, args) { return XXHash.hash(new Buffer(args.value), 0x654C6162); },
                 value : 'value'
             }
         });
@@ -60,6 +63,7 @@ function initListModule(ctx) {
             action : 'update',
             table : _this.config.name,
             columns : {
+                key : function(ctx, args) { return XXHash.hash(new Buffer(args.value), 0x654C6162); },
                 value : 'value'
             },
             conditions : [
