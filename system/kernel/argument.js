@@ -6,9 +6,7 @@ module.exports = function (arg){
 }
 
 function checkObject(arg) {
-    check(arg, 'db', [String], 'db.json');
-    check(arg, 'node', [String], 'node.json');
-    check(arg, 'cluster', [String], 'cluster.json');
+    check(arg, 'config', [String], 'saram.xml');
     check(arg, 'manager', [String], null);
 }
 

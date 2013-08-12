@@ -5,6 +5,7 @@ var CacheCluster = require("../cache/cluster.js");
 var DBCluster = require("../db/cluster.js");
 var UUID = require("../uuid/index.js");
 var Modules = require("./modules.js");
+var loadConfig = require('./configloader.js');
 
 function Kernel (arg) {
     if(!(this instanceof Kernel))
@@ -28,6 +29,9 @@ function Kernel (arg) {
     this.modules.use('elab.static', 'assets');
     this.modules.weld('assets', 'assets');
     this._assets = this.modules.get('assets');
+
+    //Load Config
+    loadConfig(this, arg.config);
 
     //Load Manager Module
     if(arg.manager) {

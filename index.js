@@ -34,4 +34,4 @@
  * saram.addReceiver([targetMid], [eventName], [mid], [action]); : targetMid의 eventName의 이벤트가 호출되면 mid의 action을 호출한다.
  */
 
-module.exports = require("./system/kernel/");
+module.exports = require("./system/kernel/index.js");
