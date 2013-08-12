@@ -6,7 +6,17 @@ var libxmljs = require("libxmljs");
 var moduleSys = require('../module/');
 
 function loadConfig(saram, file) {
-    var xmlDoc = libxmljs.parseXml(fs.readFileSync(file));
+    var data = "";
+    try {
+        data = fs.readFileSync(file);
+    } catch (e) {
+        if (e.code === 'ENOENT') {
+            return;
+        }
+        throw e;
+    }
+
+    var xmlDoc = libxmljs.parseXml(data);
 
     //Load Database
     var database = xmlDoc.root().find('database');
