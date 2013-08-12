@@ -5,6 +5,18 @@ var fs = require('fs');
 var libxmljs = require("libxmljs");
 var moduleSys = require('../module/');
 
+DEFAULT_MODULE = [
+    'saram-core/modules/account',
+    'saram-core/modules/facebook',
+    'saram-core/modules/keyvalue',
+    'saram-core/modules/layout',
+    'saram-core/modules/list',
+    'saram-core/modules/push',
+    'saram-core/modules/simauth',
+    'saram-core/modules/social',
+    'saram-core/modules/user'
+];
+
 function loadConfig(saram, file) {
     var data = "";
     try {
@@ -24,7 +36,7 @@ function loadConfig(saram, file) {
 
     //Load Cache
     var cache = xmlDoc.root().find('cache');
-    loadNode(saram.cache, cache[0]);
+    loadNode(saram.cache, cache[0], ['memory:///']);
 
     //Load Content
     var modulePath = xmlDoc.root().find('load');
@@ -43,9 +55,14 @@ function loadConfig(saram, file) {
     loadProtocols(saram.protocol, protocols[0]);
 }
 
-function loadNode(cluster, xml) {
-    if(!xml)
+function loadNode(cluster, xml, value) {
+    if(!xml) {
+        for(var i in value) {
+            cluster.addNode(value[i]);
+        }
         return;
+    }
+
 
     var node = xml.find('node');
     for(var i in node) {
@@ -54,14 +71,20 @@ function loadNode(cluster, xml) {
 }
 
 function loadContent(modules, modulePath) {
+    if(modulePath.length < 1)
+        modulePath = DEFAULT_MODULE;
+
     for(var i in modulePath) {
-        modules.load(require(modulePath[i].text()));
+        var path = typeof(modulePath[i])=="string" ? modulePath[i] : modulePath[i].text();
+        modules.load(require(path));
     }
 }
 
 function loadProtocols(manager, protocols) {
-    if(!protocols)
+    if(!protocols) {
+        manager.addProtocol("http");
         return;
+    }
 
     var protocol = protocols.find('protocol');
     for(var i in protocol) {
