@@ -24,6 +24,10 @@ function loadConfig(saram, file) {
     var rootModule = xmlDoc.root().find('module');
     loadModule(saram, rootModule[0]);
 
+    //Load Receiver
+    var receiverList = xmlDoc.find('//receiver');
+    loadReceiver(saram, receiverList);
+
     //Load Protocol
     var protocols = xmlDoc.root().find('protocols');
     loadProtocols(saram.protocol, protocols[0]);
@@ -75,10 +79,17 @@ function loadModule(saram, moduleXml, parent) {
                 actions:{},
                 pipes:[]
             });
+
+            var init = moduleXml.find('init');
+            if(init[0]) {
+                var script = init[0].text();
+                content.init = function(ctx) {
+                    eval(script);
+                }
+            }
+
             saram.modules.load(content);
         }
-        //TODO: action 등등 설정
-
         saram.modules.use(moduleName, mid, getModuleConfig(moduleXml));
         module = saram.modules.get(mid);
 
@@ -89,6 +100,24 @@ function loadModule(saram, moduleXml, parent) {
         }
     }
 
+    //Action 추가
+    var actions = moduleXml.find('action');
+    for(var i in actions) {
+        var action = actions[i];
+        var script = action.text();
+        module.addAction(action.attr('name').value(), function(ctx) {
+            eval(script);
+        });
+    }
+
+    //Pipe 추가
+    var pipes = moduleXml.find('pipe');
+    for(var i in pipes) {
+        var pipe = pipes[i];
+        module.addPipe({type:pipe.attr('type').value(), url:pipe.attr('url').value(), viewer:pipe.text()});
+    }
+
+    //자식 로드
     var child = moduleXml.find('module');
     for(var i in child) {
         loadModule(saram, child[i], module);
@@ -100,6 +129,15 @@ function getModuleConfig(moduleXml) {
     if(!config[0])
         return {};
     return JSON.parse("{" + config[0].text() + "}");
+}
+
+function loadReceiver(saram, receiverList) {
+    for(var i in receiverList) {
+        var receiver = receiverList[i];
+        var mid = receiver.parent().attr('mid');
+        mid = mid ? mid.value() : null;
+        saram.modules.addReceiver(mid, receiver.attr('event').value(), receiver.attr('receiver').value(), receiver.attr('action').value());
+    }
 }
 
 module.exports = loadConfig;
