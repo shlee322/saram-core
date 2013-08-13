@@ -17,7 +17,7 @@ Modules.prototype.load = function (content) {
         var isModule = content instanceof ModuleContent;
 
         ctx.errorTry(!isModule, Error);
-        ctx.errorTry(_this._loadedModules[content.getName()], Error);
+        //ctx.errorTry(_this._loadedModules[content.getName()], Error);
 
         _this._loadedModules[content.getName()] = content;
 
