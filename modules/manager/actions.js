@@ -1,94 +1,72 @@
 var path = require('path');
 var fs = require('fs');
 var os = require("os");
+var querystring = require("querystring");
 
 var actions = {
     main:function(ctx) {
-        var data = {};
-        data.cpus = [];
-
-        var cpus = os.cpus();
-        for(var i = 0, len = cpus.length; i < len; i++) {
-            var cpu = cpus[i];
-            var total = 0;
-            for(var type in cpu.times)
-                total += cpu.times[type];
-            data.cpus[i] = 100 - Math.round(100 * cpu.times['idle'] / total);
-        }
-        ctx.res.send(data);
-    }
-    /*
-    main:function(ctx, next) {
         ctx.res.send({});
     },
-    weld_main:function(ctx, next) {
-        ctx.res.send({tree:{"/" : {weldNames:["root"], child:generateWeldTree(ctx.saram.pipeBundle)}}});
-    },
-    get_weld_info:function(ctx, next) {
-        var mod = ctx.saram.getModuleObjectByMid(ctx.req.param.mid);
-        var test = generateWeldTree(ctx.saram.pipeBundle);
-    },
-    addModulesDir:function(ctx, next) {
-        var dir = ctx.req.query.dir;
 
-        fs.readdir(dir, function(err, files){
-            for(var i in files) {
-                var modulesDir = path.join(dir, files[i], "index.js");
+    apis:function(ctx) {
+        var data = {};
+        data.main_menu = [
+            { link:'#', text:'Home'},
+            { active:true, link:'#', text:'APIs'}
+        ]
 
-                var modDir = path.relative(__dirname, modulesDir);
-                var mod = getModuleInfo(modDir);
-                if(!mod) {
-                    continue;
-                }
-                ctx.current.module.moduleInfos[mod.getName()] = { path:modDir, info:mod };
-            }
+        data.mid = !ctx.req.query.mid ? 'saram.core' : ctx.req.query.mid;
+        data.path = !ctx.req.query.mid ? 'host/' : ctx.req.query.path;
+        data.apis = [];
+        data.weld = [];
 
-            next();
-        });
+        var module = ctx.getSaram().modules.get(data.mid);
+        var bundle = module._bundle;
 
-        return false;
-    }*/
-};
+        getAPI(module, data, bundle.get);
+        getAPI(module, data, bundle.post);
+        getAPI(module, data, bundle.put);
+        getAPI(module, data, bundle.delete);
 
-//require('./modules/actions.js')(actions);
+        for(var welded_i in bundle.weldedBundle) {
+            var pipe = bundle.weldedBundle[welded_i].pipe;
+            for(var path in bundle.weldedBundle[welded_i].bundles) {
+                var weld = bundle.weldedBundle[welded_i].bundles[path];
+                var childModule = weld._module;
 
-module.exports = actions;
-     /*
-function getModuleInfo(path) {
-    if(path == "index.js") {
-        return ;
-    }
-    var mod = require(path);
-    return mod;
-}
-
-function generateWeldTree(bundle) {
-    var tree = {};
-    for(var weld in bundle.weldedBundle) {
-        for(var path in bundle.weldedBundle[weld].bundles) {
-            var child = bundle.weldedBundle[weld].bundles[path];
-            if(!tree[child.moduleObject.getMid()]) {
-                tree[child.moduleObject.getMid()] = { weldNames:[], bundle:child };
-            }
-
-
-            var weldNameObject = {};
-            for(var name in bundle.weldList) {
-                if(bundle.weldList[name].rawPath.path != weld) {
-                    continue;
-                }
-                weldNameObject[name] = true;
-            }
-            for(var name in weldNameObject) {
-                tree[child.moduleObject.getMid()].weldNames.push(name);
+                var weldData = {};
+                weldData.path = pipe.url + path + "/";
+                weldData.module = childModule.getMid();
+                weldData.query = querystring.stringify({mid:weldData.module, path:weldData.path});
+                data.weld.push(weldData);
             }
         }
-    }
 
-    for(var mid in tree) {
-        tree[mid].child = generateWeldTree(tree[mid].bundle);
-        delete tree[mid].bundle;
+        ctx.res.send(data);
     }
+};
 
-    return tree;
-}        */
+module.exports = actions;
+
+function getAPI(module, data, bundle) {
+    var url = data.path.substring(0, data.path.length - 1);
+    for(var i in bundle) {
+        var pipe = bundle[i];
+        if(!pipe.doc)
+            continue;
+
+        var doc = module.manager.apis[pipe.doc];
+        if(!doc)
+            continue;
+
+        var apiData = {
+            method:pipe.type.toUpperCase(),
+            url:url + pipe.url,
+            name:doc.name ? doc.name : pipe.type.toUpperCase() + " " + url + pipe.url,
+            info:doc.info ? doc.info : "",
+            request:doc.request ? doc.request : {}
+        };
+
+        data.apis.push(apiData);
+    }
+}

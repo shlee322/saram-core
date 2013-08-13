@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Saram Manager</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0-rc1/css/bootstrap.min.css" rel="stylesheet">
+    <style type="text/css">
+        body { padding-top: 70px; }
+    </style>
+</head>
+<body class="container">
+<div class="navbar navbar-fixed-top">
+    <a class="navbar-brand" href="#">Saram Manager</a>
+    <ul class="nav navbar-nav">
+        <% for(var i=0; i<main_menu.length; i++) { %>
+        <% var menu = main_menu[i]; %>
+        <li<%=(menu.active ? " class='active'" : "")%>><a href="<%= menu.link %>"><%= menu.text %></a></li>
+        <% } %>
+    </ul>
+</div>
+
+<div class="row">
+    <div class="col-2">
+        <ul class="nav nav-pills nav-stacked">
+            <li class="active"><a href="#">Docs</a></li>
+        </ul>
+    </div>
+    <div class="col-10">
+        <div class="row">
+            <ul class="breadcrumb">
+                <li><a href="#"><%=mid%></a></li>
+                <li class="active"><%=path%></li>
+            </ul>
+        </div>
+
+        <% for(var i in apis) { %>
+        <% var api = apis[i]; %>
+        <div class="row">
+            <div class="col-12">
+                <h3><%=api.name%></h3>
+                <p><%=api.info%></p>
+                <ul class="nav nav-tabs">
+                    <li class="active"><a href="#request-<%=i%>}" data-toggle="tab">Request</a></li>
+                    <li><a href="#respone-<%=i%>" data-toggle="tab">Respone</a></li>
+                    <li><a href="#error-<%=i%>" data-toggle="tab">Error</a></li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="request-<%=i%>">
+                        <pre><span class="label label-<%= (api.method == 'GET' ? 'success' : api.method == 'POST' ? 'info' :  api.method == 'PUT' ? 'warning' :  api.method == 'DELETE' ? 'danger' : 'default') %>">
+                            <%=api.method%>
+                        </span> <%= api.url %></pre>
+                        <% for(var name in api.request) { %>
+                        <h4><%=name%></h4>
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Value</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <% for(var arg_i in api.request[name]) { %>
+                            <tr>
+                                <td><%=api.request[name][arg_i].name%></td>
+                                <td><%=api.request[name][arg_i].value%></td>
+                            </tr>
+                            <% } %>
+                            </tbody>
+                        </table>
+                        <% } %>
+                    </div>
+                    <div class="tab-pane" id="respone-<%=i%>">resopne</div>
+                    <div class="tab-pane" id="error-<%=i%>">error</div>
+                </div>
+            </div>
+        </div>
+        <% } %>
+
+        <% if(weld.length>0) { %>
+        <div class="row">
+            <div class="col-12">
+                <h3>Weld</h3>
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Path</th>
+                        <th>Mid</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <% for(var i=0; i<weld.length; i++) { %>
+                    <% var child = weld[i]; %>
+                    <tr>
+                        <td><a href="?<%= child.query %>"><%= child.path %></a></td>
+                        <td><a href="?<%= child.query %>"><%= child.module %></a></td>
+                    </tr>
+                    <% } %>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <% } %>
+    </div>
+</div>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0-rc1/js/bootstrap.min.js"></script>
+</body>
+</html>
