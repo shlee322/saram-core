@@ -11,6 +11,9 @@ function ModuleObject(content, mid) {
     this.pipes = new Array();
     this.pipes.__proto__ = content.pipes;
 
+    this.manager = new Object();
+    this.manager.__proto__ = content.manager;
+
     this._bundle = new Bundle(this);
 
     this._dbTable = {};
