@@ -8,6 +8,8 @@ function Protocol(saram) {
 Protocol.prototype.addProtocol = function (protocol, arg) {
     var _this = this;
     var ctx = new EventContext(this._saram, "saram.core.protocol.addProtocol");
+    if(typeof(arg) != "object")
+        arg = {};
 
     ctx.run(function () {
         if(typeof protocol == "string")

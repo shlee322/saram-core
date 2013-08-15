@@ -12,19 +12,22 @@ function Doc(doc) {
 }
 
 //Doc 확장
-Doc.prototype.addDoc = function (file) {
-    var data = "";
-    try {
-        data = fs.readFileSync(file);
-    } catch (e) {
-        if (e.code === 'ENOENT') {
-            return;
+Doc.prototype.addDoc = function (xmlDoc) {
+    if(!xmlDoc || typeof(xmlDoc)=="string") {
+        var data = "";
+        try {
+            data = fs.readFileSync(xmlDoc);
+        } catch (e) {
+            if (e.code === 'ENOENT') {
+                return;
+            }
+            throw e;
         }
-        throw e;
-    }
-    var xmlDoc = libxmljs.parseXml(data);
 
-    var apis = xmlDoc.root().find('api');
+        return this.addDoc(libxmljs.parseXml(data).root());
+    }
+
+    var apis = xmlDoc.find('api');
     for(var i in apis)
         this.loadApi(apis[i]);
 }

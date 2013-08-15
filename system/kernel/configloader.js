@@ -88,7 +88,7 @@ function loadProtocols(manager, protocols) {
 
     var protocol = protocols.find('protocol');
     for(var i in protocol) {
-        manager.addProtocol(protocol[i].attr('type').value());
+        manager.addProtocol(protocol[i].attr('type').value(), getModuleConfig(protocol[i]));
     }
 }
 
@@ -149,6 +149,13 @@ function loadModule(saram, moduleXml, parent) {
         var pipe = pipes[i];
         module.addPipe({type:pipe.attr('type').value(), url:pipe.attr('url').value(), viewer:pipe.text()});
     }
+
+    //문서 추가
+    var doc = moduleXml.find('doc');
+    if(doc.length > 0) {
+        module.doc.addDoc(doc[0]);
+    }
+
 
     //자식 로드
     var child = moduleXml.find('module');
