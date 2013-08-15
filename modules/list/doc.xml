@@ -9,7 +9,7 @@
         <response name="OK">
             <json>
 {
-    list:[
+    items:[
         { uuid:"FFFFFFFFFFFFFFFF", value:"test"}
     ]
 }

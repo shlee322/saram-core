@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<saram-module id="elab.keyvalue">
+    <name>Key-Value Store Module</name>
+    <desc>Key-Value Store</desc>
+
+    <api id="get">
+        <name>Get</name>
+        <info>해당 객체를 가져옵니다.</info>
+        <request>
+            <param name='key'>가져올 객채의 Key</param>
+        </request>
+        <response name="OK">
+            <json>
+{ uuid:"FFFFFFFFFFFFFFFF", value:"test"}
+            </json>
+        </response>
+    </api>
+    <api id="set">
+        <name>Set</name>
+        <info>데이터를 입력합니다.</info>
+        <request>
+            <param name='key'>입력할 객채의 Key</param>
+            <data name='value'>입력할할 데이터</data>
+        </request>
+        <response name="OK">
+            <json>
+{state:"OK", uuid:"FFFFFFFFFFFFFFFF"}
+            </json>
+        </response>
+    </api>
+    <api id="list">
+        <name>List</name>
+        <info>저장된 데이터 전체를 가져옵니다.</info>
+        <response name="OK">
+            <json>
+{
+    items:[
+        { uuid:"FFFFFFFFFFFFFFFF", value:"test"}
+    ]
+}
+            </json>
+        </response>
+    </api>
+</saram-module>

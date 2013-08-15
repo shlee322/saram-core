@@ -10,7 +10,7 @@ module.exports = moduleSys.init({
         return "elab.keyvalue";
     },
     init:require('./init.js'),
-    info:require('./info.js'),
+    doc:__dirname + '/doc.xml',
     actions:require('./actions.js'),
     pipes:require('./pipes.js')
 });

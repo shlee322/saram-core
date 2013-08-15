@@ -4,7 +4,7 @@
 */
 
 module.exports = [
-    {type:"POST", url:"/signup", viewer:"signup"},
-    {type:"POST", url:"/signin", viewer:"signin"},
+    {type:"POST", url:"/signup", viewer:"signup", doc:'signup'},
+    {type:"POST", url:"/signin", viewer:"signin", doc:'signin'},
     {type:"GET", url:"/get_uuid", viewer:"getUUID"}
 ];

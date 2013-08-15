@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<saram-module id="elab.account">
+    <name>Account Module</name>
+    <desc>아이디와 비밀번호를 통해 로그인을 지원하는 모듈</desc>
+    <api id="signup">
+        <name>Signup</name>
+        <info>회원가입</info>
+        <request>
+            <data name='id'>회원가입할 아이디</data>
+            <data name='pw'>회원가입할 비밀번호</data>
+        </request>
+        <response name="OK">
+            <json>
+{state:"OK"}
+            </json>
+        </response>
+    </api>
+    <api id="signin">
+        <name>Signin</name>
+        <info>로그인</info>
+        <request>
+            <data name='id'>로그인할 아이디</data>
+            <data name='pw'>로그인할 비밀번호</data>
+        </request>
+        <response name="OK">
+            <json>
+                {access_token:"FFFFFFFFFFFFFFFFFF~~~"}
+            </json>
+        </response>
+    </api>
+</saram-module>
