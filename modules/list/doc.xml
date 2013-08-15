@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<saram-module id="elab.list">
+    <name>List Store Module</name>
+    <desc>List Store</desc>
+
+    <api id="list">
+        <name>List</name>
+        <info>리스트 전체를 가져옵니다.</info>
+        <response name="OK">
+            <json>
+{
+    list:[
+        { uuid:"FFFFFFFFFFFFFFFF", value:"test"}
+    ]
+}
+            </json>
+        </response>
+    </api>
+    <api id="insert">
+        <name>Insert</name>
+        <info>데이터를 삽입합니다.</info>
+        <request>
+            <data name='value'>삽입할 데이터</data>
+        </request>
+        <response name="OK">
+            <json>
+{state:"OK", uuid:"FFFFFFFFFFFFFFFF"}
+            </json>
+        </response>>
+    </api>
+    <api id="get">
+        <name>Get</name>
+        <info>해당 객체를 가져옵니다.</info>
+        <request>
+            <param name='uuid'>가져올 객채의 UUID</param>
+        </request>
+        <response name="OK">
+            <json>
+{ uuid:"FFFFFFFFFFFFFFFF", value:"test"}
+            </json>
+        </response>
+    </api>
+    <api id="update">
+        <name>Update</name>
+        <info>데이터를 수정합니다.</info>
+        <request>
+            <param name='uuid'>수정할 객채의 UUID</param>
+            <data name='value'>수정할 데이터</data>
+        </request>
+        <response name="OK">
+            <json>
+{state:"OK", uuid:"FFFFFFFFFFFFFFFF"}
+            </json>
+        </response>
+    </api>
+    <api id="delete">
+        <name>Delete</name>
+        <info>데이터를 삭제합니다.</info>
+        <request>
+            <param name='uuid'>삭제할 객채의 UUID</param>
+        </request>
+        <response name="OK">
+            <json>
+{state:"OK"}
+            </json>
+        </response>
+    </api>
+</saram-module>

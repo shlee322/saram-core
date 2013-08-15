@@ -1,6 +1,7 @@
 var Content = require('./content.js');
 var Error = require('../error/index.js');
 var Viewer = require('../viewer/index.js');
+var Doc = require('../doc/index.js');
 
 var Module = {};
 
@@ -10,6 +11,7 @@ Module.init = function (content) {
     content.__proto__ = Content.prototype;
     Content.apply(content);
     Module.initPipes(content);
+    content.doc = new Doc(content.doc);
     return content;
 }
 

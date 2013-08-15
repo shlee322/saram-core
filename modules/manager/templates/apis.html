@@ -9,7 +9,7 @@
         body { padding-top: 70px; }
     </style>
 </head>
-<body class="container">
+<body class="container-fluid" onload="prettyPrint()">
 <div class="navbar navbar-fixed-top">
     <a class="navbar-brand" href="#">Saram Manager</a>
     <ul class="nav navbar-nav">
@@ -38,41 +38,42 @@
         <% var api = apis[i]; %>
         <div class="row">
             <div class="col-12">
-                <h3><%=api.name%></h3>
+                <div class="page-header">
+                <h1><%=api.name%></h1>
+                </div>
                 <p><%=api.info%></p>
-                <ul class="nav nav-tabs">
-                    <li class="active"><a href="#request-<%=i%>}" data-toggle="tab">Request</a></li>
-                    <li><a href="#respone-<%=i%>" data-toggle="tab">Respone</a></li>
-                    <li><a href="#error-<%=i%>" data-toggle="tab">Error</a></li>
-                </ul>
-                <div class="tab-content">
-                    <div class="tab-pane active" id="request-<%=i%>">
-                        <pre><span class="label label-<%= (api.method == 'GET' ? 'success' : api.method == 'POST' ? 'info' :  api.method == 'PUT' ? 'warning' :  api.method == 'DELETE' ? 'danger' : 'default') %>">
+                <h3>Request</h3>
+                <pre><span class="label label-<%= (api.method == 'GET' ? 'success' : api.method == 'POST' ? 'info' :  api.method == 'PUT' ? 'warning' :  api.method == 'DELETE' ? 'danger' : 'default') %>">
                             <%=api.method%>
                         </span> <%= api.url %></pre>
-                        <% for(var name in api.request) { %>
-                        <h4><%=name%></h4>
-                        <table class="table table-striped">
-                            <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Value</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <% for(var arg_i in api.request[name]) { %>
-                            <tr>
-                                <td><%=api.request[name][arg_i].name%></td>
-                                <td><%=api.request[name][arg_i].value%></td>
-                            </tr>
-                            <% } %>
-                            </tbody>
-                        </table>
-                        <% } %>
-                    </div>
-                    <div class="tab-pane" id="respone-<%=i%>">resopne</div>
-                    <div class="tab-pane" id="error-<%=i%>">error</div>
-                </div>
+                <% for(var name in api.request) { %>
+                <% if(!api.request[name]) continue; %>
+                <h4><%=name%></h4>
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Value</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <% for(var arg_i in api.request[name]) { %>
+                    <tr>
+                        <td><%=api.request[name][arg_i].name%></td>
+                        <td><%=api.request[name][arg_i].value%></td>
+                    </tr>
+                    <% } %>
+                    </tbody>
+                </table>
+                <% } %>
+                <h3>Response</h3>
+                <% for(var name in api.response) { %>
+                <h6><%=name%></h6>
+                <% if(api.response[name].info) { %>
+                <p><%=api.response[name].info%></p>
+                <% } %>
+                <pre class="prettyprint linenums languague-css"><%=api.response[name].json%></pre>
+                <% } %>
             </div>
         </div>
         <% } %>

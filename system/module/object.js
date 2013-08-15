@@ -1,5 +1,6 @@
 var Module = require('./index.js');
 var Bundle = require('./bundle.js');
+var Doc = require('../doc/index.js');
 
 function ModuleObject(content, mid) {
     var _this = this;
@@ -11,6 +12,7 @@ function ModuleObject(content, mid) {
     this.pipes = new Array();
     this.pipes.__proto__ = content.pipes;
 
+    this.doc = new Doc(content.doc);
     this.manager = new Object();
     this.manager.__proto__ = content.manager;
 

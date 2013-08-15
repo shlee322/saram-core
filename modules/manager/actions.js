@@ -55,7 +55,7 @@ function getAPI(module, data, bundle) {
         if(!pipe.doc)
             continue;
 
-        var doc = module.manager.apis[pipe.doc];
+        var doc = module.doc.getApi(pipe.doc);
         if(!doc)
             continue;
 
@@ -64,7 +64,8 @@ function getAPI(module, data, bundle) {
             url:url + pipe.url,
             name:doc.name ? doc.name : pipe.type.toUpperCase() + " " + url + pipe.url,
             info:doc.info ? doc.info : "",
-            request:doc.request ? doc.request : {}
+            request:doc.request ? doc.request : {},
+            response:doc.response ? doc.response : {}
         };
 
         data.apis.push(apiData);
