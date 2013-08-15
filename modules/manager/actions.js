@@ -16,13 +16,14 @@ var actions = {
         ]
 
         data.mid = !ctx.req.query.mid ? 'saram.core' : ctx.req.query.mid;
-        data.path = !ctx.req.query.mid ? 'host/' : ctx.req.query.path;
+        data.path = !ctx.req.query.path ? '/' : ctx.req.query.path;
         data.apis = [];
         data.weld = [];
 
         var module = ctx.getSaram().modules.get(data.mid);
         var bundle = module._bundle;
 
+        data.desc = module.doc.desc ? module.doc.desc : "";
         getAPI(module, data, bundle.get);
         getAPI(module, data, bundle.post);
         getAPI(module, data, bundle.put);
@@ -35,7 +36,7 @@ var actions = {
                 var childModule = weld._module;
 
                 var weldData = {};
-                weldData.path = pipe.url + path + "/";
+                weldData.path = data.path.substring(0, data.path.length - 1) + pipe.url + path + "/";
                 weldData.module = childModule.getMid();
                 weldData.query = querystring.stringify({mid:weldData.module, path:weldData.path});
                 data.weld.push(weldData);

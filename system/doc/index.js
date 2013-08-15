@@ -27,6 +27,14 @@ Doc.prototype.addDoc = function (xmlDoc) {
         return this.addDoc(libxmljs.parseXml(data).root());
     }
 
+    if(!this.desc) {
+        this.desc = "";
+    }
+
+    if(xmlDoc.find('desc').length > 0) {
+        this.desc = xmlDoc.find('desc')[0].text();
+    }
+
     var apis = xmlDoc.find('api');
     for(var i in apis)
         this.loadApi(apis[i]);
