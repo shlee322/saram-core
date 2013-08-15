@@ -147,7 +147,8 @@ function loadModule(saram, moduleXml, parent) {
     var pipes = moduleXml.find('pipe');
     for(var i in pipes) {
         var pipe = pipes[i];
-        module.addPipe({type:pipe.attr('type').value(), url:pipe.attr('url').value(), viewer:pipe.text()});
+        var doc = pipe.attr('doc') ? pipe.attr('doc').value() : null;
+        module.addPipe({type:pipe.attr('type').value(), url:pipe.attr('url').value(), viewer:pipe.attr('viewer').value(), doc : doc});
     }
 
     //문서 추가
