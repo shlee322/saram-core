@@ -5,6 +5,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0-rc1/css/bootstrap.min.css" rel="stylesheet">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/prettify/r224/prettify.js" type="text/javascript"></script>
+    <link href="//cdnjs.cloudflare.com/ajax/libs/prettify/r224/prettify.css" type="text/css">
     <style type="text/css">
         body { padding-top: 70px; }
     </style>
@@ -73,7 +75,7 @@
                 <% if(api.response[name].info) { %>
                 <p><%=api.response[name].info%></p>
                 <% } %>
-                <pre class="prettyprint linenums languague-css"><%=api.response[name].json%></pre>
+                <pre class="prettyprint linenums languague-js"><%=api.response[name].json%></pre>
                 <% } %>
             </div>
         </div>
