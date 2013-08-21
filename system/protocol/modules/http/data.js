@@ -10,6 +10,10 @@ function HttpData(ctx, req) {
 
 HttpData.prototype.readKeyRoutine = function (keys, callback) {
     var _this = this;
+    if(_this._data) {
+        _this._ctx.run(callback);
+        return;
+    }
 
     var data = "";
 
