@@ -37,6 +37,32 @@
         </div>
         <p><%=desc%></p>
 
+        <% if(weld.length>0) { %>
+        <div class="row">
+            <div class="col-12">
+                <h3>Weld</h3>
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Path</th>
+                        <th>Mid</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <% for(var i=0; i<weld.length; i++) { %>
+                    <% var child = weld[i]; %>
+                    <tr>
+                        <td><a href="?<%= child.query %>"><%= child.path %></a></td>
+                        <td><a href="?<%= child.query %>"><%= child.module %></a></td>
+                    </tr>
+                    <% } %>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <% } %>
+
         <% for(var i in apis) { %>
         <% var api = apis[i]; %>
         <div class="row">
@@ -81,31 +107,7 @@
         </div>
         <% } %>
 
-        <% if(weld.length>0) { %>
-        <div class="row">
-            <div class="col-12">
-                <h3>Weld</h3>
-                <table class="table table-striped">
-                    <thead>
-                    <tr>
-                        <th>Path</th>
-                        <th>Mid</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <% for(var i=0; i<weld.length; i++) { %>
-                    <% var child = weld[i]; %>
-                    <tr>
-                        <td><a href="?<%= child.query %>"><%= child.path %></a></td>
-                        <td><a href="?<%= child.query %>"><%= child.module %></a></td>
-                    </tr>
-                    <% } %>
 
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <% } %>
     </div>
 </div>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
