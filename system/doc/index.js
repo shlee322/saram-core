@@ -16,9 +16,9 @@ Doc.prototype.addDoc = function (xmlDoc) {
     if(!xmlDoc || typeof(xmlDoc)=="string") {
         var data = "";
         try {
-            data = fs.readFileSync(xmlDoc);
+            data = fs.readFileSync(xmlDoc, 'utf8');
         } catch (e) {
-            if (e.code === 'ENOENT') {
+            if (e.code === 'ENOENT' || !xmlDoc) {
                 return;
             }
             throw e;
