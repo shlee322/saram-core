@@ -1,9 +1,9 @@
 describe('Basic Module Test', function() {
     describe('List', function() {
-        it('start', function() {
-            var saram = require('saram-core');
-            var listModule = require('saram-core/modules/list');
+        var saram = require('../index.js');
+        var listModule = require('../modules/list/index.js');
 
+        it('start', function() {
             var server = saram();
             server.cache.addNode("memory:///");
             server.db.addNode("mysql://travis@127.0.0.1/saram_test");
