@@ -1,7 +1,7 @@
 describe('Basic Module Test', function() {
     describe('List', function() {
-        var saram = require('../index.js');
-        var listModule = require('../modules/list/index.js');
+        var saram = require('saram-core');
+        var listModule = require('saram-core/modules/list/index.js');
 
         it('start', function() {
             var server = saram();
