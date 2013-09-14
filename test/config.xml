@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<saram>
+    <database>
+        <node>mysql://travis@127.0.0.1/saram_test</node>
+    </database>
+    <module>
+        <module name='elab.list' mid='list_test' path='list'>
+            <config>
+                "name":"configtest_list"
+            </config>
+        </module>
+
+        <module mid='test' path='test'>
+            <init></init>
+            <action name='abcd'></action>
+            <action name='event'></action>
+            <pipe type='GET' url='/abcd' viewer='abcd' />
+            <receiver event='call.abcd.after' receiver='test' action='event' />
+        </module>
+
+        <action name="test">
+            ctx.res.send({test:true});
+        </action>
+        <pipe type='GET' url='/test' viewer='test'/>
+    </module>
+</saram>
