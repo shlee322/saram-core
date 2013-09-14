@@ -1,3 +1,5 @@
+var request = require('request');
+
 describe('Basic Module Test', function() {
     describe('List', function() {
         var saram = require('saram-core');
