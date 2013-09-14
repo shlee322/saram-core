@@ -19,7 +19,7 @@ describe('Basic Module Test', function() {
         });
 
         it('#Insert', function() {
-            request.post('http://127.0.0.1:7000/list/', {value:'test'},  function (error, response, body) {
+            request.post('http://127.0.0.1:7000/list/', {body:"value=test"},  function (error, response, body) {
                 console.log(body);
             });
         });
