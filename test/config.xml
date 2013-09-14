@@ -3,6 +3,13 @@
     <database>
         <node>mysql://travis@127.0.0.1/saram_test</node>
     </database>
+    <protocols>
+        <protocol type='http'>
+            <config>
+                port:7001
+            </config>
+        </protocol>
+    </protocols>
     <module>
         <module name='elab.list' mid='list_test' path='list'>
             <config>
