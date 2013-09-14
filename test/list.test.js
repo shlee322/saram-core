@@ -18,15 +18,32 @@ describe('Basic Module Test', function() {
             server.start();
         });
 
+        var itemUUID = "";
+
         it('#Insert', function() {
             request.post('http://127.0.0.1:7000/list/', {body:"value=test"},  function (error, response, body) {
-                console.log(body);
+                var data = JSON.parse(body);
+                itemUUID = data.uuid;
+            });
+        });
+
+        it('#Get', function() {
+            request.get('http://127.0.0.1:7000/list/' + itemUUID,  function (error, response, body) {
+            });
+        });
+
+        it('#Update', function() {
+            request.put('http://127.0.0.1:7000/list/' + itemUUID, {body:"value=1234"},  function (error, response, body) {
             });
         });
 
         it('#List', function() {
             request.get('http://127.0.0.1:7000/list/',  function (error, response, body) {
-                console.log(body);
+            });
+        });
+
+        it('#Delete', function() {
+            request.del('http://127.0.0.1:7000/list/' + itemUUID, function (error, response, body) {
             });
         });
     });
