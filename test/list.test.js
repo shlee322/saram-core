@@ -14,17 +14,17 @@ describe('Basic Module Test', function() {
             server.protocol.addProtocol("http", { port : 7000 });
 
             server.start();
+        });
 
-            it('#Insert', function() {
-                request.post('http://127.0.0.1:7000/list/', {value:'test'},  function (error, response, body) {
-                    console.log(body);
+        it('#Insert', function() {
+            request.post('http://127.0.0.1:7000/list/', {value:'test'},  function (error, response, body) {
+                console.log(body);
+            });
+        });
 
-                    it('#List', function() {
-                        request.get('http://127.0.0.1:7000/list/',  function (error, response, body) {
-                            console.log(body);
-                        });
-                    });
-                });
+        it('#List', function() {
+            request.get('http://127.0.0.1:7000/list/',  function (error, response, body) {
+                console.log(body);
             });
         });
     });

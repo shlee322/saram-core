@@ -5,3 +5,5 @@ services:
   - redis-server
 before_script:
   - mysql -e 'create database saram_test;'
+notifications:
+  email: false
