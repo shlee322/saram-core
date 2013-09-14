@@ -5,9 +5,7 @@
     </database>
     <protocols>
         <protocol type='http'>
-            <config>
-                port:7001
-            </config>
+            <config>"port":7001</config>
         </protocol>
     </protocols>
     <module>
