@@ -1,4 +1,4 @@
-Saram Framework
+Saram Framework [![Build Status](https://travis-ci.org/saramjs/saram-core.png?branch=master)](https://travis-ci.org/saramjs/saram-core) [![Coverage Status](https://coveralls.io/repos/saramjs/saram-core/badge.png)](https://coveralls.io/r/saramjs/saram-core)
 ==================
 [공식사이트](http://saram.elab.kr)   [튜토리얼](https://github.com/saramjs/saram-tutorial)
 
