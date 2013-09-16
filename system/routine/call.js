@@ -1,4 +1,5 @@
 var Engine = require('../viewer/engine.js');
+var Log = require('../log/index.js');
 
 /**
  * 이벤트를 호출하는 함수
@@ -60,6 +61,8 @@ exports.callAction = function (ctx, module, action, next) {
                 next();
             });
         }
+
+        if(Log.isView(ctx, Log.LEVEL.DEBUG)) Log.debug(ctx, "Call Action " + module.getMid() + " " + action);
 
         var actionFunc = module.actions[action];
         //ctx.before = ctx.current;

@@ -1,8 +1,11 @@
 var Call = require('./call.js');
+var Log = require('../log/index.js');
 var Viewer = require('../viewer/index.js');
 
 function request(ctx, bundle) {
     bundle = bundle ? bundle : ctx.getSaram().getCoreModule().getBundle();
+
+    Log.info(ctx, "Request " + ctx.req.method + " " + bundle._module.getMid() + ctx.req.path);
 
     ctx.run(function () {
         var pipeline = bundle.getPipeline(ctx.req.method, ctx.req.path);
