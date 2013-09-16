@@ -9,7 +9,7 @@ module.exports = {
         DB.execute(ctx, 'keyvalue.get', { key : ctx.req.param.key}, function (err, rows) {
             ctx.errorTry(err, err);
             ctx.errorTry(rows.length < 1, Error.NotFound);
-            ctx.param.set(ctx.current.module.getMid(), "key", rows[0].uuid.toString());
+            ctx.param.set(ctx.current.module.getMid(), "uuid", rows[0].uuid.toString());
             _current.next();
         });
     },
