@@ -1,4 +1,5 @@
 var mysql = require('mysql');
+var Log = require('../../../log/index.js');
 
 function Mysql(obj) {
     if(!obj.port) {
@@ -50,6 +51,8 @@ Mysql.prototype.setTable = function (ctx, table) {
     }
     query += "PRIMARY KEY (`uuid`))";
 
+    Log.debug(ctx, "Set Table " + query);
+
     //Content 생성
     this._pool.getConnection(function(err, conn) {
         ctx.run(function() {
@@ -84,6 +87,7 @@ Mysql.prototype.setQuery = function (ctx, query) {
 }
 
 Mysql.prototype.rawQuery = function (ctx, query, data, callback) {
+    if(Log.isView(ctx, Log.LEVEL.DEBUG)) Log.debug(ctx, "Query " + query + " " + JSON.stringify(data));
     if(!callback) {
         callback = data;
         data = null;
