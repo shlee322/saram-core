@@ -22,6 +22,7 @@ describe('Basic Module Test', function() {
 
         it('#Insert', function(done) {
             request.post('http://127.0.0.1:7000/list/', {body:"value=test"},  function (error, response, body) {
+                if(response.statusCode!=200) throw new Error(body);
                 var data = JSON.parse(body);
                 itemUUID = data.uuid;
                 done();
@@ -30,24 +31,28 @@ describe('Basic Module Test', function() {
 
         it('#Get', function(done) {
             request.get('http://127.0.0.1:7000/list/' + itemUUID,  function (error, response, body) {
+                if(response.statusCode!=200) throw new Error(body);
                 done();
             });
         });
 
         it('#Update', function(done) {
             request.put('http://127.0.0.1:7000/list/' + itemUUID, {body:"value=1234"},  function (error, response, body) {
+                if(response.statusCode!=200) throw new Error(body);
                 done();
             });
         });
 
         it('#List', function(done) {
             request.get('http://127.0.0.1:7000/list/',  function (error, response, body) {
+                if(response.statusCode!=200) throw new Error(body);
                 done();
             });
         });
 
         it('#Delete', function(done) {
             request.del('http://127.0.0.1:7000/list/' + itemUUID, function (error, response, body) {
+                if(response.statusCode!=200) throw new Error(body);
                 done();
             });
         });
