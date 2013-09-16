@@ -20,7 +20,7 @@ DEFAULT_MODULE = [
 function loadConfig(saram, file) {
     var data = "";
     try {
-        data = fs.readFileSync(file);
+        data = fs.readFileSync(file, 'utf8');
     } catch (e) {
         if (e.code === 'ENOENT') {
             return;
@@ -93,6 +93,11 @@ function loadProtocols(manager, protocols) {
 }
 
 function loadModule(saram, moduleXml, parent) {
+    var moduleFile = moduleXml.attr('file');
+    if(moduleFile) {
+        return loadModule(saram, libxmljs.parseXml(fs.readFileSync(moduleFile.value(), 'utf8')), parent);
+    }
+
     var module = null;
 
     var moduleName = moduleXml.attr('name');
@@ -138,6 +143,11 @@ function loadModule(saram, moduleXml, parent) {
     for(var i in actions) {
         var action = actions[i];
         var script = action.text();
+        var file = action.attr('file');
+        if(file) {
+            script = fs.readFileSync(file.value(), 'utf8');
+        }
+
         module.addAction(action.attr('name').value(), function(ctx) {
             eval(script);
         });
