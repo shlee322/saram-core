@@ -24,7 +24,7 @@ Param.prototype.get = function(mid, key) {
 var checkReg = /^[0-9A-Fa-f]+$/;
 function checkValue(value) {
     if(!value.match(checkReg)) {
-        throw "Error HEX - value:" + value;
+        throw new Error("Error HEX - value:" + value);
     }
 }
 
