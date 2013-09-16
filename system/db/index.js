@@ -1,4 +1,5 @@
 var Param = require('./param.js');
+var Log = require('../log/index.js');
 
 exports.setTable = function (ctx, table) {
     ctx.errorTry(typeof(table.name) != "string", Error);
@@ -68,6 +69,12 @@ exports.setQuery = function (ctx, query) {
 
     var module = ctx.current.module;
 
+    //파티셔닝
+    if(!query.partitioner) {
+        var HashShard = require('./partitioners/hashshard/index.js');
+        query.partitioner = new HashShard();
+    }
+
     for(var node in cluster) {
         var protocol = cluster[node].getProtocol();
         var queryList = module._dbQuery[query.name];
@@ -86,13 +93,17 @@ exports.setQuery = function (ctx, query) {
 exports.execute = function (ctx, query, args, callback) {
     var module = ctx.current.module;
     var query = module._dbQuery[query];
+
+    if(Log.isView(ctx, Log.LEVEL.DEBUG)) Log.debug(ctx, "Call DB Execute " + module.getMid() + " " + query);
+
     if(!query)
         return callback();
 
     var clusterName = "default";
 
     var cluster = ctx.getSaram().db.getCluster(clusterName);
-    return query.protocol[cluster[0].getProtocol()].execute(ctx, cluster[0], args, callback);
+
+    return query.query.partitioner.execute(ctx, query, cluster, args, callback);
 }
 
 exports.rawQuery = function (ctx, sharedKey, func, clusterName) {
