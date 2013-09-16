@@ -1,6 +1,7 @@
 var XXHash = require('xxhash');
 var DB = require('../../system/db/index.js');
 var DBParam = require('../../system/db/param.js');
+var HashShard = require('../../system/db/partitioners/hashshard/index.js');
 
 
 function initKeyValueModule(ctx) {
@@ -14,6 +15,13 @@ function initKeyValueModule(ctx) {
         _this.config.list = ctx.req.data.getValue("list", false);
 
         var param = new DBParam(_this.config.param, "int64", "UNIQUE");
+
+        var shardingItems = [param];
+        if(!_this.config.list) {
+            shardingItems.push(function(ctx, args) { return XXHash.hash(new Buffer(args.key), 0x654C6162); });
+        }
+
+        var hashshard = new HashShard(shardingItems);
 
         DB.setTable(ctx, {
             name : _this.config.name,
@@ -29,6 +37,7 @@ function initKeyValueModule(ctx) {
             name : "keyvalue.get",
             action : 'select',
             table : _this.config.name,
+            partitioner:hashshard,
             columns : {
                 uuid : 'uuid',
                 str : 'key',
@@ -43,6 +52,7 @@ function initKeyValueModule(ctx) {
             name : "keyvalue.list",
             action : 'select',
             table : _this.config.name,
+            partitioner:hashshard,
             columns : {
                 uuid : 'uuid',
                 str : 'key',
@@ -56,6 +66,7 @@ function initKeyValueModule(ctx) {
             name : "keyvalue.set",
             action : 'upsert',
             table : _this.config.name,
+            partitioner:hashshard,
             columns : {
                 param : param,
                 key : function(ctx, args) { return XXHash.hash(new Buffer(args.key), 0x654C6162); },
