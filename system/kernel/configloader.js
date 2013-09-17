@@ -95,7 +95,7 @@ function loadProtocols(manager, protocols) {
 function loadModule(saram, moduleXml, parent) {
     var moduleFile = moduleXml.attr('file');
     if(moduleFile) {
-        return loadModule(saram, libxmljs.parseXml(fs.readFileSync(moduleFile.value(), 'utf8')), parent);
+        return loadModule(saram, libxmljs.parseXml(fs.readFileSync(moduleFile.value(), 'utf8')).root(), parent);
     }
 
     var module = null;
