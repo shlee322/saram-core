@@ -164,7 +164,11 @@ function loadModule(saram, moduleXml, parent) {
     //문서 추가
     var doc = moduleXml.find('doc');
     if(doc.length > 0) {
-        module.doc.addDoc(doc[0]);
+        var docObj = doc[0];
+        if(docObj.attr('file')) {
+            docObj = libxmljs.parseXml(fs.readFileSync(docObj.attr('file').value(), 'utf8')).root();
+        }
+        module.doc.addDoc(docObj);
     }
 
 
