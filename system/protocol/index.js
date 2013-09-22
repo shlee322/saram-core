@@ -30,6 +30,7 @@ Protocol.prototype.start = function (ctx, cb) {
         var protocol = queue.shift();
         protocol.start(callback);
     }
+    callback();
 }
 
 module.exports = Protocol;
