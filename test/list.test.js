@@ -9,10 +9,10 @@ describe('Basic Module Test', function() {
             var server = saram();
             server.cache.addNode("memory:///");
             server.db.addNode("mysql://travis@127.0.0.1/saram_test");
-            server.modules.load(listModule);
+            server.load(listModule);
 
-            server.modules.use('elab.list', 'list_test', { name:"list_test" });
-            server.modules.weld('list_test', 'list');
+            server.use('elab.list', 'list_test', { name:"list_test" });
+            server.weld('list_test', 'list');
             server.protocol.addProtocol("http", { port : 7000 });
 
             server.start(done);
@@ -29,7 +29,6 @@ describe('Basic Module Test', function() {
 
                 var data = JSON.parse(body);
                 itemUUID = data.uuid;
-                console.log(data);
                 done();
             });
         });
