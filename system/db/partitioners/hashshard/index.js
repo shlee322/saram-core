@@ -62,9 +62,14 @@ HashShard.prototype.execute = function (ctx, query, cluster, args, callback) {
             if(err) {
                 allErr = err;
             }
-            for(var i in rows) {
-                allRows.push(rows[i]);
+            if(rows instanceof Array) {
+                for(var i in rows) {
+                    allRows.push(rows[i]);
+                }
+            } else {
+                allRows = rows;
             }
+
             if(count >= length) {
                 callback(err, allRows);
             }
