@@ -19,9 +19,17 @@ Protocol.prototype.addProtocol = function (protocol, arg) {
     });
 }
 
-Protocol.prototype.start = function (ctx) {
-    for(var i in this._protocol)
-        this._protocol[i].start();
+Protocol.prototype.start = function (ctx, cb) {
+    var queue = this._protocol.slice();
+
+    var callback = function () {
+        if(queue.length < 1) {
+            cb();
+            return;
+        }
+        var protocol = queue.shift();
+        protocol.start(callback);
+    }
 }
 
 module.exports = Protocol;

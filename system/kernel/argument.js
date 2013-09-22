@@ -8,6 +8,7 @@ module.exports = function (arg){
 function checkObject(arg) {
     check(arg, 'config', [String], 'saram.xml');
     check(arg, 'manager', [String], null);
+    check(arg, 'callback', [Function], function(){});
 }
 
 function check(arg, key, type, value){

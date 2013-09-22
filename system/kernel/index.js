@@ -41,13 +41,15 @@ function Kernel (arg) {
         this.manager = this.modules.get('elab.manager');
         this.modules.weld('elab.manager', arg.manager);
     }
+
+    arg.callback();
 }
 
 /**
  * Saram Framework 가동 함수
  */
-Kernel.prototype.start = function () {
-    this.protocol.start();
+Kernel.prototype.start = function (cb) {
+    this.protocol.start(null, cb);
 }
 
 /**

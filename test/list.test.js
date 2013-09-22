@@ -5,7 +5,7 @@ describe('Basic Module Test', function() {
         var saram = require('saram-core');
         var listModule = require('saram-core/modules/list/index.js');
 
-        it('#Start', function() {
+        it('#Start', function(done) {
             var server = saram();
             server.cache.addNode("memory:///");
             server.db.addNode("mysql://travis@127.0.0.1/saram_test");
@@ -15,7 +15,7 @@ describe('Basic Module Test', function() {
             server.modules.weld('list_test', 'list');
             server.protocol.addProtocol("http", { port : 7000 });
 
-            server.start();
+            server.start(done);
         });
 
         var itemUUID = "";
