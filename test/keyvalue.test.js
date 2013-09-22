@@ -20,22 +20,19 @@ describe('Basic Module Test', function() {
 
         it('#Set(Insert)', function(done) {
             request.post('http://127.0.0.1:7002/keyvalue/test', {body:"value=test"},  function (error, response, body) {
-                if(response.statusCode!=200) throw new Error(body);
-                done();
+                done(response.statusCode!=200 ? new Error(body) : undefined);
             });
         });
 
         it('#Get', function(done) {
             request.get('http://127.0.0.1:7002/keyvalue/test',  function (error, response, body) {
-                if(response.statusCode!=200) throw new Error(body);
-                done();
+                done(response.statusCode!=200 ? new Error(body) : undefined);
             });
         });
 
         it('#Set(Update)', function(done) {
             request.post('http://127.0.0.1:7002/keyvalue/test', {body:"value=1234"},  function (error, response, body) {
-                if(response.statusCode!=200) throw new Error(body);
-                done();
+                done(response.statusCode!=200 ? new Error(body) : undefined);
             });
         });
     });

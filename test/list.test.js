@@ -22,38 +22,39 @@ describe('Basic Module Test', function() {
 
         it('#Insert', function(done) {
             request.post('http://127.0.0.1:7000/list/', {body:"value=test"},  function (error, response, body) {
-                if(response.statusCode!=200) throw new Error(body);
+                if(response.statusCode!=200) {
+                    done(new Error(body));
+                    return;
+                }
+
                 var data = JSON.parse(body);
                 itemUUID = data.uuid;
+                console.log(data);
                 done();
             });
         });
 
         it('#Get', function(done) {
             request.get('http://127.0.0.1:7000/list/' + itemUUID,  function (error, response, body) {
-                if(response.statusCode!=200) throw new Error(body);
-                done();
+                done(response.statusCode!=200 ? new Error(body) : undefined);
             });
         });
 
         it('#Update', function(done) {
             request.put('http://127.0.0.1:7000/list/' + itemUUID, {body:"value=1234"},  function (error, response, body) {
-                if(response.statusCode!=200) throw new Error(body);
-                done();
+                done(response.statusCode!=200 ? new Error(body) : undefined);
             });
         });
 
         it('#List', function(done) {
             request.get('http://127.0.0.1:7000/list/',  function (error, response, body) {
-                if(response.statusCode!=200) throw new Error(body);
-                done();
+                done(response.statusCode!=200 ? new Error(body) : undefined);
             });
         });
 
         it('#Delete', function(done) {
             request.del('http://127.0.0.1:7000/list/' + itemUUID, function (error, response, body) {
-                if(response.statusCode!=200) throw new Error(body);
-                done();
+                done(response.statusCode!=200 ? new Error(body) : undefined);
             });
         });
     });
