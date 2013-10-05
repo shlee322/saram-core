@@ -9,12 +9,6 @@ function HttpRequestBody(ctx, req) {
     this._type = this._req.headers['content-type'];
     this._size = parseInt(this._req.headers['content-length']);
     this._buf = "";
-    this._data = {};
-}
-
-HttpRequestBody.prototype.getValue = function (key, defaultValue) {
-    var val = this._data[key];
-    return val ? val : defaultValue;
 }
 
 HttpRequestBody.prototype.readBody = function (cb) {
@@ -35,6 +29,7 @@ HttpRequestBody.prototype.readBody = function (cb) {
         _this.parseData(cb);
     });
 }
+
 HttpRequestBody.prototype.parseData = function (cb) {
     if(!this._type || this._type == "application/x-www-form-urlencoded") {
         this._data = querystring.parse(this._buf);
