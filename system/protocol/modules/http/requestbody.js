@@ -36,7 +36,7 @@ HttpRequestBody.prototype.readBody = function (cb) {
     });
 }
 HttpRequestBody.prototype.parseData = function (cb) {
-    if(this._type == "application/x-www-form-urlencoded") {
+    if(!this._type || this._type == "application/x-www-form-urlencoded") {
         this._data = querystring.parse(this._buf);
         this._buf = null;
     } else {
