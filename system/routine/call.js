@@ -63,7 +63,7 @@ exports.callAction = function (ctx, module, action, next) {
         ctx.current = {module:module, action:action, autoNext:true, next:after};
 
         ctx.req.body.readBody(function() {
-            _callActionRoutine(ctx, actionFunc, next);
+            _callActionRoutine(ctx, actionFunc, after);
         })
     });
 }
