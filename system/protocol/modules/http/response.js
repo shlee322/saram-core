@@ -2,10 +2,14 @@ var url = require('url');
 var querystring = require('querystring');
 var fs = require('fs');
 var Response = require('../../../context/response.js');
-var Header = require('../../../context/header.js');
-var ResponseCode = require('./responsecode.js');
+var Header = require('../../../context/header/header.js');
+var Accept = require('../../../context/header/accept.js');
+var Viewer = require('../../../viewer/index.js');
+var JsonViewer = require('../../../viewer/json/index.js');
+var LayoutViewer = require('../../../viewer/layout/index.js');
 
 var SERVER = "saram.elab.kr/" + require('../../../../package.json').version;
+var ErrorLayout = new LayoutViewer(__dirname + '/layout/error.html', 'ejs');
 
 function HttpResponse(ctx, res) {
     Response.apply(this, [ctx]);
@@ -13,52 +17,30 @@ function HttpResponse(ctx, res) {
     this._raw = res;
 }
 
-HttpResponse.prototype.send = function (data, header) {
-    if(!header)
-        header = new Header.Header();
+HttpResponse.prototype.sendResponse = function () {
+    var accept = new Accept(this._ctx.req.headers.get("accept", "*/*"));
+    var type = accept.find(["application/json", "text/html"]);
 
-    this._raw.writeHead(
-        header.get(Header.Key.RESPONSE_CODE, 200),
-        {
-            "Server":SERVER,
-            "Content-Type": header.get(Header.Key.CONTENT_TYPE, 'application/json; charset=utf-8;')
-        }
-    );
-
-    if(data instanceof fs.ReadStream) {
-        var _this = this;
-        data.on("data",function(d){
-            _this._raw.write(d, 'binary');
-        });
-        data.on("end",function(){
-            _this._raw.end();
-        });
-
-        return;
+    var lastviewer = this._data[this._data.length - 1].viewer;
+    var isJsonViewer = lastviewer == JsonViewer;
+    //html인 경우 JsonHtml Layout으로 덮어씌움(Layout)
+    if (type == "text/html" && isJsonViewer) {
+        this.setContentType("text/html; charset=utf-8;");
+        this._data.push({module:this._ctx.getSaram().getCoreModule(), viewer:ErrorLayout, data:{ content : true}});
+    }
+    if(type == "application/json" && !isJsonViewer) {
+        this.setContentType("application/json; charset=utf-8;");
+        //TODO : JsonViewer이 아닐 경우 덮어씌우기
     }
 
-    if(data instanceof Object) {
-        data = JSON.stringify(data);
-    }
+    var _this = this;
 
-    this._raw.end(data);
-}
-
-HttpResponse.prototype.error = function (data, header) {
-    if(!header)
-        header = new Header.Header();
-
-    if(data instanceof ResponseCode.Response)
-        header.set(Header.Key.RESPONSE_CODE, data.responseCode);
-
-    this._raw.writeHead(
-        header.get(Header.Key.RESPONSE_CODE, 501),
-        {
-            "Server":SERVER,
-            "Content-Type": header.get(Header.Key.CONTENT_TYPE, 'application/json; charset=utf-8;')
-        }
-    );
-    this._raw.end(typeof data == "string" ? data : JSON.stringify({error:{mid:data.mid, code:data.code, message:data.message, stack:data.stack}}));
+    Viewer.process(this, this._data.slice(), function(buf) {
+        _this.setHeader("Server", SERVER);
+        _this.setHeader("Content-Type", _this.getContentType());
+        _this._raw.writeHead(_this.getStatus(), _this._headers);
+        _this._raw.end(buf, 'utf8');
+    });
 }
 
 HttpResponse.prototype.__proto__ = Response.prototype;

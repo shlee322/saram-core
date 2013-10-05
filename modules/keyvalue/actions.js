@@ -29,21 +29,19 @@ module.exports = {
         var _current = ctx.current;
         _current.autoNext = false;
 
-        ctx.req.data.readKey("value", function() {
-            var data = {
-                key : ctx.req.param.key,
-                value:ctx.req.data.getValue("value")
-            };
+        var data = {
+            key : ctx.req.param.key,
+            value:ctx.req.body.getValue("value")
+        };
 
-            DB.execute(ctx, 'keyvalue.set', data, function (err, rows) {
-                ctx.errorTry(err, err);
-                ctx.res.send({state:"OK", uuid:rows.uuid});
-                _current.next();
-            });
+        DB.execute(ctx, 'keyvalue.set', data, function (err, rows) {
+            ctx.errorTry(err, err);
+            ctx.res.send({state:"OK", uuid:rows.uuid});
+            _current.next();
         });
     },
     list : function (ctx) {
-        ctx.errorTry(!ctx.current.module.config.list, Error);
+        ctx.errorTry(!ctx.current.module.config.list, Error.DisabledList);
 
         var _current = ctx.current;
         _current.autoNext = false;

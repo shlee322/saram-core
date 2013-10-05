@@ -3,7 +3,7 @@ function Header(data) {
 
     if(data) {
         for(var i in data) {
-            this._data[data[i][0]] = data[i][1];
+            this._data[i] = data[i];
         }
     }
 }
@@ -22,6 +22,8 @@ exports.Header = Header;
 exports.Key = {};
 exports.Key.RESPONSE_CODE = "code";
 exports.Key.CONTENT_TYPE = "Content-Type";
+exports.Key.SET_COOKIE = "Set-Cookie";
+
 
 exports.Value = {};
 exports.Value.RESPONSE_CODE = {};

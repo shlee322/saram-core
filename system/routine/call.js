@@ -1,4 +1,3 @@
-var Engine = require('../viewer/engine.js');
 var Log = require('../log/index.js');
 
 /**
@@ -32,8 +31,10 @@ exports.callReceiver = function (ctx, receiverList, callback) {
         callback();
         return;
     }
-
+    var temp = ctx.currentReceiver;
+    ctx.currentReceiver = receiver;
     exports.callAction(ctx, receiver.module, receiver.action, function (){
+        ctx.currentReceiver = temp;
         exports.callReceiver(ctx, receiverList, callback);
     });
 }
@@ -48,13 +49,6 @@ exports.callReceiver = function (ctx, receiverList, callback) {
  * @param step Call Next Step Function
  */
 exports.callAction = function (ctx, module, action, next) {
-    var viewer = action;
-    if(viewer instanceof Engine) {
-        action = viewer.getAction();
-    } else {
-        viewer = null;
-    }
-
     exports.callEvent(ctx, module, "call." + action +".before", function() {
         var after = function() {
             exports.callEvent(ctx, module, "call." + action +".after", function() {
@@ -68,16 +62,9 @@ exports.callAction = function (ctx, module, action, next) {
         //ctx.before = ctx.current;
         ctx.current = {module:module, action:action, autoNext:true, next:after};
 
-        if(viewer) {
-            viewer.setResponse(ctx, function (res) {
-                _callActionRoutine(ctx, actionFunc, function() {
-                    ctx.res = res;
-                    next();
-                });
-            });
-        } else {
+        ctx.req.body.readBody(function() {
             _callActionRoutine(ctx, actionFunc, next);
-        }
+        })
     });
 }
 

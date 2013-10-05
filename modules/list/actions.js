@@ -17,14 +17,12 @@ module.exports = {
         var _current = ctx.current;
         _current.autoNext = false;
 
-        ctx.req.data.readKey("value", function() {
-            var data = { value:ctx.req.data.getValue("value") };
+        var data = { value:ctx.req.body.getValue("value") };
 
-            DB.execute(ctx, 'list.insert', data, function (err, rows) {
-                ctx.errorTry(err, err);
-                ctx.res.send({state:"OK", uuid:rows.uuid});
-                _current.next();
-            });
+        DB.execute(ctx, 'list.insert', data, function (err, rows) {
+            ctx.errorTry(err, err);
+            ctx.res.send({state:"OK", uuid:rows.uuid});
+            _current.next();
         });
     },
     get : function (ctx) {
@@ -42,14 +40,12 @@ module.exports = {
         var _current = ctx.current;
         _current.autoNext = false;
 
-        ctx.req.data.readKey("value", function() {
-            var data = { uuid:ctx.req.param.uuid, value:ctx.req.data.getValue("value") };
+        var data = { uuid:ctx.req.param.uuid, value:ctx.req.body.getValue("value") };
 
-            DB.execute(ctx, 'list.update', data, function (err, rows) {
-                ctx.errorTry(err, err);
-                ctx.res.send({state:"OK", uuid:ctx.req.param.uuid});
-                _current.next();
-            });
+        DB.execute(ctx, 'list.update', data, function (err, rows) {
+            ctx.errorTry(err, err);
+            ctx.res.send({state:"OK", uuid:ctx.req.param.uuid});
+            _current.next();
         });
     },
     delete : function (ctx) {

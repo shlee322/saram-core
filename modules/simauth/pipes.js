@@ -1,3 +1,3 @@
 module.exports = [
-    {type:"POST", url:"/auth", viewer:"auth"}
+    {type:"POST", url:"/auth", action:"auth"}
 ];

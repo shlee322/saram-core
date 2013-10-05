@@ -10,18 +10,21 @@ function request(ctx, bundle) {
     ctx.run(function () {
         var pipeline = bundle.getPipeline(ctx.req.method, ctx.req.path);
         ctx.errorTry(!pipeline.found, Error);
-        routine(ctx, pipeline);
+        routine(ctx, pipeline, function () {
+            ctx.errorTry(!ctx.req.body.isRead(), Error); //용량 큼
+            ctx.res.sendResponse();
+        });
     });
 }
 
-function routine(ctx, pipeline) {
+function routine(ctx, pipeline, cb) {
     var nowPipe = pipeline.pipeline.shift();
     if(!nowPipe) {
-        return;
+        cb();
     }
 
     if(!nowPipe.module) {
-        return routine(ctx, pipeline);
+        return routine(ctx, pipeline, cb);
     }
 
     //ctx.mObj = nowPipe.module.obj;
@@ -41,9 +44,8 @@ function routine(ctx, pipeline) {
         ctx.req.param[nowPipe.pipe.rawPath.param[index-1]] = nowPipe.match[index];
     }
 
-
-    Call.callAction(ctx, nowPipe.module, nowPipe.pipe.viewer, function (){
-        routine(ctx, pipeline);
+    Call.callAction(ctx, nowPipe.module, nowPipe.pipe.action, function (){
+        routine(ctx, pipeline, cb);
     });
 }
 

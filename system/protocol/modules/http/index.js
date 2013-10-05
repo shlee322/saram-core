@@ -12,7 +12,10 @@ function HttpProtocol(ctx, arg) {
     Log.notice(ctx, "Load HTTP Protocol - Port : " + this.port);
     var saram = ctx.getSaram();
     this._server = http.createServer(function(req, res) {
-        request(new HttpContext(saram, req, res));
+        var ctx = new HttpContext(saram, req, res);
+        ctx.req.body.readBody(function() {
+            request(ctx);
+        });
     });
 }
 

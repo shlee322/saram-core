@@ -1,10 +1,10 @@
 var Context = require('../context/index.js');
-var Data = require('./data.js');
+var EventRequestBody = require('./requestbody.js');
 
 function EventContext(saram, event, data) {
     Context.apply(this, [saram]);
 
-    this.req.data = new Data(data);
+    this.req.body = new EventRequestBody(this, data);
 }
 
 EventContext.prototype.__proto__ = Context.prototype;

@@ -19,13 +19,13 @@
             <init></init>
             <action name='abcd'></action>
             <action name='event'></action>
-            <pipe type='GET' url='/abcd' viewer='abcd' />
+            <pipe type='GET' url='/abcd' action='abcd' />
             <receiver event='call.abcd.after' receiver='test' action='event' />
         </module>
 
         <action name="test">
             ctx.res.send({test:true});
         </action>
-        <pipe type='GET' url='/test' viewer='test'/>
+        <pipe type='GET' url='/test' action='test'/>
     </module>
 </saram>

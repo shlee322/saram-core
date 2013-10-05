@@ -1,6 +1,5 @@
 var Content = require('./content.js');
 var Error = require('../error/index.js');
-var Viewer = require('../viewer/index.js');
 var Doc = require('../doc/index.js');
 
 var Module = {};
@@ -32,9 +31,6 @@ Module.initPipe = function (pipe) {
     } else if(pipe.weld instanceof String) {
         pipe.weld = [pipe.weld];
     }
-
-    if(typeof pipe.viewer == "string")
-        pipe.viewer = Viewer.Engine(pipe.viewer, "json");
 
     var reg = /(?:\/:(\w+))/g;
     var r = /(?:\/+)/g;

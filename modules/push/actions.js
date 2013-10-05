@@ -4,20 +4,19 @@ module.exports = {
     add:function (ctx) {
         ctx.current.authNext = false;
         var saram = ctx.getSaram();
-        ctx.req.data.readKey(["device"], function() {
-            var service = ctx.current.module._service[ctx.req.param.service];
 
-            ctx.errorTry(!service, Error); // service.notfound
+        var service = ctx.current.module._service[ctx.req.param.service];
 
-            service.add(ctx, function(data){
-                Call.post(ctx, "/" + ctx.req.param.service + "/", {data:{value:JSON.stringify(data)}}, function(obj) {
-                    ctx.run(function(){
-                        ctx.errorTry(obj.error, obj.error);
-                        ctx.res.send(obj);
-                        ctx.current.next();
-                    });
-                }, ctx.current.module.getMid(), { param : ctx.param });
-            });
+        ctx.errorTry(!service, Error); // service.notfound
+
+        service.add(ctx, function(data){
+            Call.post(ctx, "/" + ctx.req.param.service + "/", {data:{value:JSON.stringify(data)}}, function(obj) {
+                ctx.run(function(){
+                    ctx.errorTry(obj.error, obj.error);
+                    ctx.res.send(obj);
+                    ctx.current.next();
+                });
+            }, ctx.current.module.getMid(), { param : ctx.param });
         });
     },
     send:function (ctx) {

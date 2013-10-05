@@ -9,17 +9,15 @@ module.exports = {
         ctx.param.set(ctx.current.module.getMid(), "uuid", uuid);
     },
     addFollowing:function(ctx) {
-        ctx.req.data.readKey(["object", "target"], function() {
-            var module = ctx.current.module;
-            var object = ctx.req.data.getValue("object");
-            var target = ctx.req.data.getValue("target");
+        var module = ctx.current.module;
+        var object = ctx.req.body.getValue("object");
+        var target = ctx.req.body.getValue("target");
 
-            Call.post(ctx, "/" + object + "/following/", {weld:module, data:{value:target}}, function(obj) {
-            });
-            Call.post(ctx, "/" + target + "/follower/", {weld:module, data:{value:object}}, function(obj) {
-            });
-            ctx.res.send({state:'OK'});
+        Call.post(ctx, "/" + object + "/following/", {weld:module, data:{value:target}}, function(obj) {
         });
+        Call.post(ctx, "/" + target + "/follower/", {weld:module, data:{value:object}}, function(obj) {
+        });
+        ctx.res.send({state:'OK'});
     },
     boxlist:function(ctx) {
         var saram = ctx.getSaram();

@@ -35,7 +35,6 @@ function Kernel (arg) {
 
     //Load Manager Module
     if(arg.manager) {
-        this.modules.load(require('../../modules/layout/index.js'));
         this.modules.load(require('../../modules/manager/index.js'));
         this.modules.use('elab.manager', 'elab.manager');
         this.manager = this.modules.get('elab.manager');

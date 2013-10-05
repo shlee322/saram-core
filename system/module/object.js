@@ -55,13 +55,13 @@ ModuleObject.prototype.addPipe = function (pipe) {
     this._bundle.addPipe(pipe);
 }
 
-ModuleObject.prototype.addReceiver = function (event, module, action) {
+ModuleObject.prototype.addReceiver = function (event, module, action, arg) {
     var e = this._event[event];
     if(!e) {
         e = [];
         this._event[event] = e;
     }
-    e.push({module:module, action:action});
+    e.push({module:module, action:action, arg:arg});
 }
 
 module.exports = ModuleObject;

@@ -43,7 +43,7 @@ var actions = {
             }
         }
 
-        ctx.res.send(data);
+        ctx.res.send(data, this.layout_apis);
     }
 };
 

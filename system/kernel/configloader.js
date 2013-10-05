@@ -9,7 +9,6 @@ DEFAULT_MODULE = [
     'saram-core/modules/account',
     'saram-core/modules/facebook',
     'saram-core/modules/keyvalue',
-    'saram-core/modules/layout',
     'saram-core/modules/list',
     'saram-core/modules/push',
     'saram-core/modules/simauth',
@@ -158,7 +157,7 @@ function loadModule(saram, moduleXml, parent) {
     for(var i in pipes) {
         var pipe = pipes[i];
         var doc = pipe.attr('doc') ? pipe.attr('doc').value() : null;
-        module.addPipe({type:pipe.attr('type').value(), url:pipe.attr('url').value(), viewer:pipe.attr('viewer').value(), doc : doc});
+        module.addPipe({type:pipe.attr('type').value(), url:pipe.attr('url').value(), action:pipe.attr('action').value(), doc : doc});
     }
 
     //문서 추가

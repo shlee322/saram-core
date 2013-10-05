@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Saram Framework - Error</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+    <script src="//code.jquery.com/jquery.js"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="page-header">
+            <h1>Saram Framework Error</h1>
+            <p class="lead">에러가 발생했긔 ㅠㅠ</p>
+        </div>
+        <p id="msg"></p>
+
+        <div class="json">
+            <pre style="word-wrap: break-word;white-space: pre-wrap;white-space: -moz-pre-wrap;white-space: -pre-wrap;white-space: -o-pre-wrap;word-break:break-all;"><code id='jsondata'><%=content %></code></pre>
+        </div>
+    </div>
+    <script language="javascript">
+        var div = document.all("jsondata");
+        var data = JSON.parse(div.innerHTML);
+        document.all("msg").innerHTML = data.error.message;
+        div.innerHTML = JSON.stringify(data, {}, "<br>").replace(/\\n    at/gi, "<br>    at");
+    </script>
+</body>
+</html>

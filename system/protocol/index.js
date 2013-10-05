@@ -24,7 +24,9 @@ Protocol.prototype.start = function (ctx, cb) {
 
     var callback = function () {
         if(queue.length < 1) {
-            cb();
+            if(cb) {
+                cb();
+            }
             return;
         }
         var protocol = queue.shift();

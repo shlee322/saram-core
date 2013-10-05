@@ -7,12 +7,10 @@ function CallResponse(ctx, pernet, callback) {
     this._callback = callback;
 }
 
-CallResponse.prototype.send = function (data) {
-    this._callback(data);
-}
-
-CallResponse.prototype.error = function (data) {
-    this._callback(data);
+CallResponse.prototype.sendResponse = function () {
+    var root = this._data.pop();
+    root._stack = this._data;
+    this._callback(root);
 }
 
 CallResponse.prototype.__proto__ = Response.prototype;
