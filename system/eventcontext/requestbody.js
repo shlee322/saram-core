@@ -4,7 +4,9 @@ function EventRequestBody(ctx, data) {
     RequestBody.apply(this, [ctx]);
 
     this._ctx = ctx;
-    this._data = data;
+    if(data) {
+        this._data = data;
+    }
 }
 
 EventRequestBody.prototype.readBody = function (cb) {
