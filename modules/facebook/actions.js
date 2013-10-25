@@ -25,7 +25,7 @@ module.exports = {
                 ctx.current.next();
             });
 
-            ctx.current.authNext = false;
+            ctx.current.autoNext = false;
         }
 
         if(!ctx.req.query.fb_token) {
@@ -68,7 +68,7 @@ module.exports = {
             });
         });
 
-        ctx.current.authNext = false;
+        ctx.current.autoNext = false;
     },
 
     getUUID: function(ctx) {

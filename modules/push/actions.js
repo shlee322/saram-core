@@ -2,7 +2,7 @@ var Call = require('../../system/call/index.js');
 
 module.exports = {
     add:function (ctx) {
-        ctx.current.authNext = false;
+        ctx.current.autoNext = false;
         var saram = ctx.getSaram();
 
         var service = ctx.current.module._service[ctx.req.param.service];
