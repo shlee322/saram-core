@@ -5,6 +5,7 @@ function CallRequestBody(ctx, data) {
 
     this._ctx = ctx;
     this._data = data;
+    this._read = true;
 }
 
 CallRequestBody.prototype.readBody = function (cb) {
