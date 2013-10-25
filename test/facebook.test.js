@@ -40,7 +40,7 @@ describe('Basic Module Test', function() {
 
         it('#getUUID', function(done) {
             Call.get(ctx, "/facebook/get_uuid", {fb_id:"100006017199691"}, function(obj) {
-                done(!obj.uuid ? new Error("UUID 취득 실패"), undefined);
+                done(!obj.uuid ? new Error("UUID 취득 실패") : undefined);
             });
         });
 

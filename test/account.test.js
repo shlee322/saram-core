@@ -50,7 +50,7 @@ describe('Basic Module Test', function() {
 
         it('#getUUID', function(done) {
             Call.get(ctx, "/account/get_uuid", {id:"test"}, function(obj) {
-                done(!obj.uuid ? new Error("UUID 취득 실패"), undefined);
+                done(!obj.uuid ? new Error("UUID 취득 실패") : undefined);
             });
         });
 
