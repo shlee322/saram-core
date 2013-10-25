@@ -34,6 +34,9 @@ describe('Basic Module Test', function() {
 
         it('#Auth', function(done) {
             request.get('http://127.0.0.1:7000/facebook/auth?fb_token=' + fb_token, function (error, response, body) {
+                if(error) {
+                    return done(error);
+                }
                 done(response.statusCode!=200 ? new Error(body) : undefined);
             });
         });
