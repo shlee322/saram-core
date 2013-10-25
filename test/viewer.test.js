@@ -1,13 +1,11 @@
 var request = require('request');
 var JsonViewer = require('saram-core/system/viewer/json/index.js');
-var EjsViewer = require('saram-core/system/viewer/layout/index.js');
+var EjsViewer = require('saram-core/system/viewer/layout/engine/ejs/index.js');
 
 describe('Viewer', function() {
     describe('Json Viewer', function() {
-        var viewer = new JsonViewer();
-
         it('View', function(done) {
-            viewer.process(null, [], {data:{test:1234}}, function (data) {
+            JsonViewer.process(null, [], {data:{test:1234}}, function (data) {
                 done(!data ? new Error("Json Viewer Error") : undefined);
             })
         });
