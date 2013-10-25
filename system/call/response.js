@@ -8,7 +8,8 @@ function CallResponse(ctx, pernet, callback) {
 }
 
 CallResponse.prototype.sendResponse = function () {
-    var root = this._data.pop();
+    var data = this._data.pop();
+    var root = data.data;
     root._stack = this._data;
     this._callback(root);
 }

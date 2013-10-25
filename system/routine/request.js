@@ -21,6 +21,7 @@ function routine(ctx, pipeline, cb) {
     var nowPipe = pipeline.pipeline.shift();
     if(!nowPipe) {
         cb();
+        return;
     }
 
     if(!nowPipe.module) {
