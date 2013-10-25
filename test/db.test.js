@@ -5,7 +5,7 @@ var DB = require('saram-core/system/db/index.js');
 
 describe('DB', function() {
     var server = null;
-    var module = module:{_dbQuery:{}};
+    var module = {_dbQuery:{}};
 
     it('#Start', function(done) {
         server = saram();
