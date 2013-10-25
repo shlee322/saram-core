@@ -4,9 +4,10 @@ describe('Basic Module Test', function() {
     describe('List', function() {
         var saram = require('saram-core');
         var listModule = require('saram-core/modules/list/index.js');
+        var server = null;
 
         it('#Start', function(done) {
-            var server = saram();
+            server = saram();
             server.cache.addNode("memory:///");
             server.db.addNode("mysql://travis@127.0.0.1/saram_test");
             server.load(listModule);
@@ -55,6 +56,10 @@ describe('Basic Module Test', function() {
             request.del('http://127.0.0.1:7000/list/' + itemUUID, function (error, response, body) {
                 done(response.statusCode!=200 ? new Error(body) : undefined);
             });
+        });
+
+        it('#Stop', function(done) {
+            server.stop(done);
         });
     });
 });

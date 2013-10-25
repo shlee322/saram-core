@@ -5,7 +5,7 @@
     </database>
     <protocols>
         <protocol type='http'>
-            <config>"port":7001</config>
+            <config>"port":7000</config>
         </protocol>
     </protocols>
     <module>
@@ -15,7 +15,7 @@
             </config>
         </module>
 
-        <module mid='test' path='test'>
+        <module mid='test' path='testmod'>
             <init></init>
             <action name='abcd'></action>
             <action name='event'></action>
