@@ -5,6 +5,7 @@ var DB = require('saram-core/system/db/index.js');
 
 describe('DB', function() {
     var server = null;
+    var module = module:{_dbQuery:{}};
 
     it('#Start', function(done) {
         server = saram();
@@ -15,7 +16,10 @@ describe('DB', function() {
     });
 
     it('#SetTable', function(done) {
-        DB.setTable(new EventContext(server, "saram.test.db", {}), {
+        var ctx = new EventContext(server, "saram.test.db", {});
+        ctx.current = {module:module};
+
+        DB.setTable(ctx, {
             name : "dbtest_test",
             columns : {
                 test : {type:"string"}
@@ -25,7 +29,10 @@ describe('DB', function() {
     });
 
     it('#SetQuery', function(done) {
-        DB.setQuery(new EventContext(server, "saram.test.db", {}), {
+        var ctx = new EventContext(server, "saram.test.db", {});
+        ctx.current = {module:module};
+
+        DB.setQuery(ctx, {
             name : "db.test",
             action : 'insert',
             table : "dbtest_test",
@@ -37,7 +44,10 @@ describe('DB', function() {
     });
 
     it('#Execute', function(done) {
-        DB.execute(new EventContext(server, "saram.test.db", {}), 'db.test', { test:"1234" }, function (err, rows) {
+        var ctx = new EventContext(server, "saram.test.db", {});
+        ctx.current = {module:module};
+
+        DB.execute(ctx, 'db.test', { test:"1234" }, function (err, rows) {
             done(err ? err : undefined);
         });
     });
