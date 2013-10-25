@@ -5,6 +5,7 @@ describe('Basic Module Test', function() {
         var saram = require('saram-core');
         var accountModule = require('saram-core/modules/account/index.js');
         var userModule = require('saram-core/modules/user/index.js');
+        var Call = require('saram-core/system/call/index.js');
         var server = null;
 
         it('#Start', function(done) {
@@ -48,11 +49,10 @@ describe('Basic Module Test', function() {
         });
 
         it('#getUUID', function(done) {
-            request.get('http://127.0.0.1:7000/account/get_uuid?access_token='+access_token, function (error, response, body) {
-                done(response.statusCode==200 ? new Error("권한 체크 버그") : undefined);
+            Call.get(ctx, "/get_uuid", {id:"test"}, function(obj) {
+                done(!obj.uuid ? new Error("UUID 취득 실패"), undefined);
             });
         });
-
 
         it('#Stop', function(done) {
             server.stop(done);
