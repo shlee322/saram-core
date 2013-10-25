@@ -7,6 +7,7 @@ var callReceiver = false;
 var callReceiver2 = false;
 
 var module = {
+    getMid : function () { return "testModule" },
     actions : {
         test : function (ctx) {
             callAction = true;
