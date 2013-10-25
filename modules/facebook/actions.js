@@ -72,6 +72,8 @@ module.exports = {
     },
 
     getUUID: function(ctx) {
+        ctx.current.autoNext = false;
+
         ctx.errorTry(ctx.req.sender.type != "server", Error); // 'perm.notserver'
 
         var id = ctx.req.query.fb_id;
@@ -82,6 +84,7 @@ module.exports = {
             ctx.errorTry(rows.length < 1, Error); //'user.notfound'
 
             ctx.res.send({uuid:rows[0].uuid});
+            ctx.current.next();
         });
     }
 };
