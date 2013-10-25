@@ -14,11 +14,13 @@ describe('Basic Module Test', function() {
             server.load(accountModule);
             server.load(userModule);
 
-            server.use('elab.user', 'users');
+            server.use('elab.user', 'user');
             server.use('elab.account', 'account', {
                 name:'account',
-                user:'users'
+                user:'user'
             });
+            server.weld('user','users');
+            server.weld('account','account');
             server.protocol.addProtocol("http", { port : 7000 });
 
             server.start(done);
