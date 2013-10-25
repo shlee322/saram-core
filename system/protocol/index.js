@@ -35,4 +35,20 @@ Protocol.prototype.start = function (ctx, cb) {
     callback();
 }
 
+Protocol.prototype.stop = function (ctx, cb) {
+    var queue = this._protocol.slice();
+
+    var callback = function () {
+        if(queue.length < 1) {
+            if(cb) {
+                cb();
+            }
+            return;
+        }
+        var protocol = queue.shift();
+        protocol.stop(callback);
+    }
+    callback();
+}
+
 module.exports = Protocol;

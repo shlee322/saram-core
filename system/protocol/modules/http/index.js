@@ -27,5 +27,8 @@ HttpProtocol.prototype.start = function (cb) {
     this._server.listen(this.port, this.hostname, this.backlog, cb);
 }
 
-module.exports = HttpProtocol;
+HttpProtocol.prototype.stop = function (cb) {
+    this._server.close(cb);
+}
 
+module.exports = HttpProtocol;

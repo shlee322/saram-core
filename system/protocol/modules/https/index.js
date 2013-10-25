@@ -13,5 +13,8 @@ HttpsProtocol.prototype.start = function () {
     this._server.listen(443);
 }
 
-module.exports = HttpsProtocol;
+HttpProtocol.prototype.stop = function (cb) {
+    this._server.close(cb);
+}
 
+module.exports = HttpsProtocol;

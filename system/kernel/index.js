@@ -51,6 +51,11 @@ Kernel.prototype.start = function (cb) {
     this.protocol.start(null, cb);
 }
 
+Kernel.prototype.stop = function (cb) {
+    this.protocol.stop(null, cb);
+    //TODO : DB, Cache 커넥션 끊기
+}
+
 /**
  * Saram Core의 Module Object
  * @returns {ModuleObject}
