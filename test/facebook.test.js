@@ -5,12 +5,24 @@ var userModule = require('saram-core/modules/user/index.js');
 var Call = require('saram-core/system/call/index.js');
 var EventContext = require('saram-core/system/eventcontext/index.js');
 
-var fb_token = "CAAE5LkmS4PoBAEpd9tMKn9xCrIRzM758jlZCBu0Ly1tGfZBuLMVHTTuZBYsnvGQ0YGWVE3xMy9Uf5SKQqCU75ZBOlx7TNetQqXC9t5h7VpbZBSi9FHLFY7Nk7LQzf8yTdzNSKuevPQhHzgVpGSRJl1zhkoFLLr7YxG3WFcKkPuAoUVzSYEEli23kqj16VoL6WTLDZCKp3gKgZDZD";
+var client_id = "344345942352122";
+var client_secret = "fa03d9cf4718ee254362def1689f9935";
+
 
 describe('Basic Module Test', function() {
     describe('Facebook', function() {
-
         var server = null;
+        var fb_token = "";
+
+        it('#Init Facebook', function(done) {
+            request.get("https://graph.facebook.com/oauth/access_token?client_id=" + client_id + "&client_secret=" + client_secret + "&grant_type=client_credentials", function (error, response, body) {
+                request.get("https://graph.facebook.com/" + client_id + "/accounts/test-users?" + body, function (error, response, body) {
+                    var data = JSON.parse(body);
+                    fb_token = data.data[0].access_token;
+                    done();
+                });
+            });
+        });
 
         it('#Start', function(done) {
             server = saram();

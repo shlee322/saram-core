@@ -31,7 +31,7 @@ describe('Basic Module Test', function() {
         });
 
         it('#My UUID(GET UUID)', function(done) {
-            request.post('http://127.0.0.1:7000/users/my_uuid?access_token='+access_token, function (error, response, body) {
+            request.get('http://127.0.0.1:7000/users/my_uuid?access_token='+access_token, function (error, response, body) {
                 if(response.statusCode!=200) {
                     done(new Error(body));
                     return;
