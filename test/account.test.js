@@ -1,11 +1,12 @@
 var request = require('request');
+var saram = require('saram-core');
+var accountModule = require('saram-core/modules/account/index.js');
+var userModule = require('saram-core/modules/user/index.js');
+var Call = require('saram-core/system/call/index.js');
+var EventContext = require('saram-core/system/eventcontext/index.js');
 
 describe('Basic Module Test', function() {
     describe('Account', function() {
-        var saram = require('saram-core');
-        var accountModule = require('saram-core/modules/account/index.js');
-        var userModule = require('saram-core/modules/user/index.js');
-        var Call = require('saram-core/system/call/index.js');
         var server = null;
 
         it('#Start', function(done) {
@@ -49,7 +50,7 @@ describe('Basic Module Test', function() {
         });
 
         it('#getUUID', function(done) {
-            Call.get(ctx, "/account/get_uuid", {id:"test"}, function(obj) {
+            Call.get(new EventContext(server, "saram.test.account", {}), "/account/get_uuid", {id:"test"}, function(obj) {
                 done(!obj.uuid ? new Error("UUID 취득 실패") : undefined);
             });
         });

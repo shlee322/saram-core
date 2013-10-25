@@ -1,5 +1,9 @@
+var saram = require('saram-core');
+var EventContext = require('saram-core/system/eventcontext/index.js');
+var Cache = require('saram-core/system/cache/index.js');
+
 describe('Cache', function() {
-    var saram = require('saram-core');
+    
 	var server = null;
 
     it('#Start', function(done) {
@@ -10,15 +14,15 @@ describe('Cache', function() {
     });
 
     it('#Set', function() {
-        server.cache.set("test", "1234");
+        Cache.set(new EventContext(server, "saram.test.cache", {}), "test", "1234");
     });
 
     it('#Set-Callback', function(done) {
-        server.cache.set("test", "1234", function(){done();});
+        Cache.set(new EventContext(server, "saram.test.cache", {}), "test", "1234", function(){done();});
     });
 
     it('#Get', function(done) {
-        server.cache.get("test", function(value){
+        Cache.get(new EventContext(server, "saram.test.cache", {}), "test", function(value){
             done(value!="1234" ? new Error("넣었던 값과 다름") : undefined);
         });
     });
