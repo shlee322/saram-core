@@ -12,7 +12,7 @@ describe('Viewer', function() {
     });
 
     describe('EJS Viewer', function() {
-        var viewer = new EjsViewer(__dirname + 'test.ejs');
+        var viewer = new EjsViewer(__dirname + '/test.ejs');
 
         it('View', function(done) {
             viewer.render({test:1234}, function(html){
