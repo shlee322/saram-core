@@ -1,4 +1,5 @@
 var request = require('request');
+var EventContext = require('saram-core/system/eventcontext/index.js');
 var RoutineCall = require('saram-core/system/routine/call.js');
 
 var callAction = false;
@@ -32,7 +33,7 @@ module._event = {
 
 describe('Routine', function() {
     it('#Event+Receiver+Action', function(done) {
-        RoutineCall.callAction(ctx, module, "test", function() {
+        RoutineCall.callAction(new EventContext(null, "saram.test.routine", {}), module, "test", function() {
             done(!(callAction && callReceiver && callReceiver2) ? new Error(body) : undefined);
         });
     });
