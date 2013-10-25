@@ -1,9 +1,11 @@
 var request = require('request');
 
+var fb_token = "CAAE5LkmS4PoBAEpd9tMKn9xCrIRzM758jlZCBu0Ly1tGfZBuLMVHTTuZBYsnvGQ0YGWVE3xMy9Uf5SKQqCU75ZBOlx7TNetQqXC9t5h7VpbZBSi9FHLFY7Nk7LQzf8yTdzNSKuevPQhHzgVpGSRJl1zhkoFLLr7YxG3WFcKkPuAoUVzSYEEli23kqj16VoL6WTLDZCKp3gKgZDZD";
+
 describe('Basic Module Test', function() {
-    describe('Account', function() {
+    describe('Facebook', function() {
         var saram = require('saram-core');
-        var accountModule = require('saram-core/modules/account/index.js');
+        var FacebookModule = require('saram-core/modules/facebook/index.js');
         var userModule = require('saram-core/modules/user/index.js');
         var Call = require('saram-core/system/call/index.js');
         var server = null;
@@ -12,44 +14,32 @@ describe('Basic Module Test', function() {
             server = saram();
             server.cache.addNode("memory:///");
             server.db.addNode("mysql://travis@127.0.0.1/saram_test");
-            server.load(accountModule);
+            server.load(facebookModule);
             server.load(userModule);    
 
             server.use('elab.user', 'user');
-            server.use('elab.account', 'account', {
-                name:'account',
+            server.modules.use('elab.facebook', 'facebook', {
+                client_id:'344345942352122',
+                client_secret:'secret',
+                url:'http://127.0.0.1:7000/facebook',
+                state:'',
                 user:'user'
             });
             server.weld('user','users');
-            server.weld('account','account');
+            server.weld('facebook','facebook');
             server.protocol.addProtocol("http", { port : 7000 });
 
             server.start(done);
         });
 
-        var access_token = "";
-
-        it('#Signup', function(done) {
-            request.post('http://127.0.0.1:7000/account/signup', {body:"id=test&pw=test"},  function (error, response, body) {
+        it('#Auth', function(done) {
+            request.get('http://127.0.0.1:7000/facebook/auth?fb_token=' + fb_token, function (error, response, body) {
                 done(response.statusCode!=200 ? new Error(body) : undefined);
             });
         });
 
-        it('#Signin', function(done) {
-            request.post('http://127.0.0.1:7000/account/signin', {body:"id=test&pw=test"},  function (error, response, body) {
-                if(response.statusCode!=200) {
-                    done(new Error(body));
-                    return;
-                }
-
-                var data = JSON.parse(body);
-                access_token = data.access_token;
-                done();
-            });
-        });
-
         it('#getUUID', function(done) {
-            Call.get(ctx, "/account/get_uuid", {id:"test"}, function(obj) {
+            Call.get(ctx, "/facebook/get_uuid", {fb_id:"100006017199691"}, function(obj) {
                 done(!obj.uuid ? new Error("UUID 취득 실패"), undefined);
             });
         });
