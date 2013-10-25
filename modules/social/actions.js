@@ -20,6 +20,8 @@ module.exports = {
         ctx.res.send({state:'OK'});
     },
     boxlist:function(ctx) {
+        ctx.current.autoNext = false;
+        
         var saram = ctx.getSaram();
         var object = ctx.req.param.uuid;
         ctx.errorTry(!object.match(UUID_Reg), Error); // 'notuuid'
