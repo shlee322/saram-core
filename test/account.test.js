@@ -12,7 +12,7 @@ describe('Basic Module Test', function() {
             server.cache.addNode("memory:///");
             server.db.addNode("mysql://travis@127.0.0.1/saram_test");
             server.load(accountModule);
-            server.load(userModule);
+            server.load(userModule);    
 
             server.use('elab.user', 'user');
             server.use('elab.account', 'account', {
@@ -49,9 +49,10 @@ describe('Basic Module Test', function() {
 
         it('#getUUID', function(done) {
             request.get('http://127.0.0.1:7000/account/get_uuid?access_token='+access_token, function (error, response, body) {
-                done(response.statusCode!=200 ? new Error(body) : undefined);
+                done(response.statusCode==200 ? new Error("권한 체크 버그") : undefined);
             });
         });
+
 
         it('#Stop', function(done) {
             server.stop(done);
