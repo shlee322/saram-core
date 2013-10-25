@@ -45,25 +45,25 @@ describe('Call', function() {
 
     it('#Get', function(done) {
         Call.get(new EventContext(server, "saram.test.call", {}), "/test_get", {}, function(obj) {
-            done(!test_get || obj.state != "OK" ? new Error("Call.get Error") : undefined);
+            done(!call_get || obj.state != "OK" ? new Error("Call.get Error") : undefined);
         });
     });
 
     it('#Post', function(done) {
         Call.post(new EventContext(server, "saram.test.call", {}), "/test_post", {}, function(obj) {
-            done(!test_post || obj.state != "OK" ? new Error("Call.post Error") : undefined);
+            done(!call_post || obj.state != "OK" ? new Error("Call.post Error") : undefined);
         });
     });
 
     it('#Put', function(done) {
         Call.put(new EventContext(server, "saram.test.call", {}), "/test_put", {}, function(obj) {
-            done(!test_put || obj.state != "OK" ? new Error("Call.put Error") : undefined);
+            done(!call_put || obj.state != "OK" ? new Error("Call.put Error") : undefined);
         });
     });
 
     it('#Delete', function(done) {
         Call.delete(new EventContext(server, "saram.test.call", {}), "/test_delete", {}, function(obj) {
-            done(!test_delete || obj.state != "OK" ? new Error("Call.delete Error") : undefined);
+            done(!call_delete || obj.state != "OK" ? new Error("Call.delete Error") : undefined);
         });
     });
 

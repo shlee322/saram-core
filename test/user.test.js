@@ -31,8 +31,14 @@ describe('Basic Module Test', function() {
         });
 
         it('#My UUID(GET UUID)', function(done) {
-            Call.get(new EventContext(server, "saram.test.user", {}), "/users/my_uuid", {access_token:access_token}, function(obj) {
-                done(obj.uuid != "1111" ? new Error("My UUID Error") : undefined);
+            request.post('http://127.0.0.1:7000/users/my_uuid?access_token='+access_token, function (error, response, body) {
+                if(response.statusCode!=200) {
+                    done(new Error(body));
+                    return;
+                }
+
+                var data = JSON.parse(body);
+                done(data.uuid != "1111" ? new Error("My UUID Error") : undefined);
             });
         });
 
