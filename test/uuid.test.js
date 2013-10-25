@@ -1,4 +1,5 @@
-var UUID = require('saram-core/system/uuid/index.js');
+var UUID_Class = require('saram-core/system/uuid/index.js');
+var UUID = new UUID_Class();
 
 describe('UUID', function() {
     it('#Generate', function(done) {
