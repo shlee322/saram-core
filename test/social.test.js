@@ -24,15 +24,15 @@ describe('Basic Module Test', function() {
         });
 
         it('#Add Following', function(done) {
-            Call.post(new EventContext(server, "saram.test.social", {}), "/social/add_following", {data:{object:'2', target:'1'}}, function(obj) {
-                Call.post(new EventContext(server, "saram.test.social", {}), "/social/add_following", {data:{object:'3', target:'1'}}, function(obj) {
+            Call.post(new EventContext(server, "saram.test.social", {}), "/social/add_following", {data:{object:'00000002', target:'00000001'}}, function(obj) {
+                Call.post(new EventContext(server, "saram.test.social", {}), "/social/add_following", {data:{object:'00000003', target:'00000001'}}, function(obj) {
                     done();
                 });
             });
         });
 
         it('#Box List', function(done) {
-            Call.get(new EventContext(server, "saram.test.social", {}), "/social/1/box/list", {}, function(obj){
+            Call.get(new EventContext(server, "saram.test.social", {}), "/social/00000001/box/list", {}, function(obj){
                 done(obj.target.length != 2 ? new Error("Box List Length Error") : undefined)
             });
         });
