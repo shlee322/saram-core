@@ -16,6 +16,8 @@ describe('Basic Module Test', function() {
 
             server.use('elab.user', 'user');
             server.weld('user','users');
+            server.modules.addReceiver("user", "call.my_uuid.before", "user", "auth");
+
             server.protocol.addProtocol("http", { port : 7000 });
 
             server.start(done);
