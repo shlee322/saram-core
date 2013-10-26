@@ -30,18 +30,21 @@ describe('Basic Module Test', function() {
         it('#Create UUID 1', function(done) {
             server.uuid.generate(function (uuid){
                 uuid_1 = uuid;
+                done();
             });
         });
 
         it('#Create UUID 2', function(done) {
             server.uuid.generate(function (uuid){
                 uuid_2 = uuid;
+                done();
             });
         });
 
         it('#Create UUID 3', function(done) {
             server.uuid.generate(function (uuid){
                 uuid_3 = uuid;
+                done();
             });
         });
 
