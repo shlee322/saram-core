@@ -4,11 +4,13 @@ function initPushModule(ctx) {
     var mid = ctx.current.module.getMid();
 
     _this._service = {};
+    _this._serviceLength = 0;
 
     var service = ctx.req.body.getValue("service");
     var param = ctx.req.body.getValue("param");
 
     for(var i in service) {
+        _this._serviceLength = _this._serviceLength + 1;
         var moduleName = ctx.current.module.getMid()+'.'+i;
         saram.modules.use('elab.list', mid+'.'+i, {
             name:mid+"_"+i,

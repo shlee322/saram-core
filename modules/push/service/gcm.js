@@ -25,13 +25,14 @@ module.exports = function (ctx, name, obj) {
             body : body
         }, function (error, res, body) {
             if(error) {
-                console.log(error);
+                next({error:error});
                 return;
             }
             if(res.statusCode != 200) {
-                console.log(body);
+                next({error:body});
                 return;
             }
+            next({data:body});
         });
     };
 }

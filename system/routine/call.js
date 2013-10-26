@@ -59,6 +59,9 @@ exports.callAction = function (ctx, module, action, next) {
         if(Log.isView(ctx, Log.LEVEL.DEBUG)) Log.debug(ctx, "Call Action " + module.getMid() + " " + action);
 
         var actionFunc = module.actions[action];
+        if(!actionFunc) {
+            Log.warning(ctx, "Null Action " + module.getMid() + " " + action);
+        }
         //ctx.before = ctx.current;
         ctx.current = {module:module, action:action, autoNext:true, next:after};
 
