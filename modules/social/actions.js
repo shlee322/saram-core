@@ -9,15 +9,27 @@ module.exports = {
         ctx.param.set(ctx.current.module.getMid(), "uuid", uuid);
     },
     addFollowing:function(ctx) {
+        ctx.current.autoNext = false;
+
         var module = ctx.current.module;
         var object = ctx.req.body.getValue("object");
         var target = ctx.req.body.getValue("target");
 
+        var count = 0;
+        var callback = function(obj) {
+            count = count + 1;
+            if(count >= 2) {
+                ctx.res.send({state:'OK'});
+                ctx.current.next();
+            }
+        }
+
         Call.post(ctx, "/" + object + "/following/", {weld:module, data:{value:target}}, function(obj) {
+            callback(obj);
         });
         Call.post(ctx, "/" + target + "/follower/", {weld:module, data:{value:object}}, function(obj) {
+            callback(obj);
         });
-        ctx.res.send({state:'OK'});
     },
     boxlist:function(ctx) {
         ctx.current.autoNext = false;
@@ -35,6 +47,7 @@ module.exports = {
             }
             list.push(object);
             ctx.res.send({target:list});
+            ctx.current.next();
         });
     }
 }
