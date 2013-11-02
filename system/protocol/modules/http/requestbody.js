@@ -1,3 +1,4 @@
+var Log = require('../../../log/index.js');
 var querystring = require('querystring');
 var RequestBody = require('../../../context/requestbody.js');
 
@@ -31,10 +32,22 @@ HttpRequestBody.prototype.readBody = function (cb) {
 }
 
 HttpRequestBody.prototype.parseData = function (cb) {
-    if(!this._type || this._type == "application/x-www-form-urlencoded") {
+    var type = this._type;
+
+    if(!type) {
+        type = "application/x-www-form-urlencoded";
+    }
+
+    var index = type.indexOf(";");
+    if(index != -1) {
+        type = type.substring(0, index);
+    }
+
+    if(type == "application/x-www-form-urlencoded") {
         this._data = querystring.parse(this._buf);
         this._buf = null;
     } else {
+        Log.warning(this._ctx, "지정되지 않은 Content Type - " + type);
     }
     cb();
 }
