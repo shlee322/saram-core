@@ -5,7 +5,7 @@ var Call = require('../../system/call/index.js');
 
 module.exports = {
     auth: function(ctx) {
-        ctx.current.autoNext = false
+        ctx.current.autoNext = false;
 
         var key = ctx.req.body.getValue("key");
 

@@ -10,7 +10,10 @@ var Log = require('../log/index.js');
  */
 exports.callEvent = function (ctx, module, event, callback) {
     var receiverList = module._event[event];
-    if(!receiverList) {
+    if(Log.isView(ctx, Log.LEVEL.DEBUG)) Log.debug(ctx, "Call Event " + module.getMid() + " " + event);
+
+    //이 이벤트에 연결된 리시버가 하나도 존재하지 않을 경우
+    if(!receiverList || receiverList.length < 1) {
         callback();
         return;
     }
@@ -28,13 +31,24 @@ exports.callEvent = function (ctx, module, event, callback) {
 exports.callReceiver = function (ctx, receiverList, callback) {
     var receiver = receiverList.shift();
     if(!receiver) {
-        callback();
+        //TODO : 그냥 다음꺼 넘어가게 할까?
         return;
     }
+
     var temp = ctx.currentReceiver;
     ctx.currentReceiver = receiver;
+    var saveIsAutoNext = ctx.current.autoNext;
+
     exports.callAction(ctx, receiver.module, receiver.action, function (){
+        ctx.current.autoNext = saveIsAutoNext;
         ctx.currentReceiver = temp;
+
+        if(receiverList.length < 1) {
+            //if(ctx.current.autoNext) {
+                callback();
+            //}
+            return;
+        }
         exports.callReceiver(ctx, receiverList, callback);
     });
 }
@@ -63,17 +77,18 @@ exports.callAction = function (ctx, module, action, next) {
             Log.warning(ctx, "Null Action " + module.getMid() + " " + action);
         }
         //ctx.before = ctx.current;
-        ctx.current = {module:module, action:action, autoNext:true, next:after};
+        ctx.current = { module:module, action:action, autoNext:true, next:after };
 
         ctx.req.body.readBody(function() {
             _callActionRoutine(ctx, actionFunc, after);
-        })
+        });
     });
 }
 
 function _callActionRoutine(ctx, actionFunc, nextFunc) {
     ctx.run(function() {
         actionFunc(ctx);
+
         if( ctx.current.autoNext ) {
             nextFunc();
         }
