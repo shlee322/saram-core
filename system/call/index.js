@@ -18,7 +18,7 @@ exports.delete = function (ctx, path, data, callback) {
 };
 
 exports.request = function (pernet, method, path, data, callback) {
-    if(!data.query && !data.data && !data.weld && !data.param)
+    if(!data.query && !data.data && !data.body && !data.weld && !data.param)
         return exports.request(pernet, method, path, {query:data}, callback);
 
     var ctx = new Context(pernet, method, path, data, callback);
