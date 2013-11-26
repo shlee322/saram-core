@@ -10,6 +10,21 @@ function Response(ctx) {
     this.setContentType("application/json; charset=utf-8;");
 }
 
+Response.prototype.getData = function (mid) {
+    var data = this.getDataArray(mid);
+    return data ? data[0] : null;
+}
+
+Response.prototype.getDataArray = function (mid) {
+    var data = [];
+    for(var i in this._data) {
+        if(!mid || this._data[i].module.getMid() == mid) {
+            data.push(this._data[i]);
+        }
+    }
+    return data;
+}
+
 Response.prototype.send = function (data, viewer) {
     if(!viewer)
         viewer = JsonViewer;

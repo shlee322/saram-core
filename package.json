@@ -1,10 +1,10 @@
 {
   "name": "saram-core",
-  "description": "saram.elab.kr",
+  "description": "",
   "version": "0.1.0-dev",
   "repository": {
       "type": "git",
-      "url": "git://github.com/saramjs/saram-core.git"
+      "url": "git://github.com/shlee322/saram-core.git"
   },
   "author": "Lee Sanghyuck <shlee322@gmail.com> (http://profile.elab.kr)",
   "dependencies": {

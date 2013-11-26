@@ -12,7 +12,7 @@ function initListModule(ctx) {
     _this.config.param = ctx.req.body.getValue("param", []);
     _this.config.overlap = ctx.req.body.getValue("overlap", true);
 
-    var param = new DBParam(_this.config.param, "int64", _this.config.overlap ? "UNIQUE " : "INDEX");
+    var param = new DBParam(_this.config.param, "int64", _this.config.overlap ? "UNIQUE" : "INDEX");
     var hashshard = new HashShard([param]);
 
     DB.setTable(ctx, {
