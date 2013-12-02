@@ -4,7 +4,7 @@ node_js:
 services:
 - redis-server
 before_script:
-- sed -i "s/{BuildId}/$TRAVIS_BUILD_NUMBER/g" package.json
+- sed -i "s/\"version\": \"\([0-9]\).\([0-9]\).0-dev/\"version\": \"\1.\2.$TRAVIS_BUILD_NUMBER-dev/" package.json
 - mysql -e 'create database saram_test;'
 notifications:
   email: false
