@@ -13,6 +13,7 @@ DEFAULT_MODULE = [
     'saram-core/modules/list',
     'saram-core/modules/push',
     'saram-core/modules/simauth',
+    'saram-core/modules/single',
     'saram-core/modules/social',
     'saram-core/modules/user'
 ];

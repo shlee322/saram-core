@@ -33,8 +33,8 @@ Modules.prototype.use = function (name, mid, arg) {
     ctx.run(function () {
         var content = _this._loadedModules[name];
 
-        ctx.errorTry(!content, Error);
-        ctx.errorTry(_this._modules[mid], Error);
+        ctx.errorTry(!content, new Error(ctx, "kernel.module.content.notfound", "Not Found Content - name:" + name));
+        ctx.errorTry(_this._modules[mid], new Error(ctx, "kernel.module.exist", "Exist Module - mid:" + mid));
 
         var module = new ModuleObject(content, mid);
         _this._modules[mid] = module;

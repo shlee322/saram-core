@@ -32,7 +32,7 @@ RequestBody.prototype.getValue = function (key, defaultValue) {
     }
 
     var val = this._data[key];
-    return val ? val : defaultValue;
+    return val !== undefined ? val : defaultValue;
 }
 
 RequestBody.prototype.setValue = function (key, value) {
