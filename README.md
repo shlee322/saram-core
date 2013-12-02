@@ -1,6 +1,6 @@
 Saram Framework [![Build Status](https://travis-ci.org/shlee322/saram-core.png?branch=master)](https://travis-ci.org/shlee322/saram-core) [![Coverage Status](https://coveralls.io/repos/shlee322/saram-core/badge.png)](https://coveralls.io/r/shlee322/saram-core)
 ==================
-[공식사이트](http://saram.elab.kr)
+[공식사이트](https://github.com/shlee322/saram-core)
 
 [튜토리얼](https://github.com/shlee322/saram-core/tree/master/tutorial)
 
@@ -69,7 +69,7 @@ saram.xml
                 var val = ctx.req.body.getValue('a', '') + ctx.req.body.getValue('b', '');
                 ctx.req.body.setValue('value', val);
             </action>
-            <receiver event='call.set.before' receiver='data', action='setDataAction'/>
+            <receiver event='call.set.before' receiver='data' action='setDataAction'/>
         </module>
     </module>
 </saram>
@@ -131,7 +131,7 @@ Rceiver 또한 Action으로 취급하여 Action와 완벽하게 동일한 호출
 
 Pipe
 ---------------------------
-Pipe는 Request가 어느 Action을 호출해야하는지 알려주는 지표 역활을 합니다.
+Pipe는 Request가 어느 Action을 호출해야하는지 알려주는 지표 역할을 합니다.
 
 Pipe의 종류에는 GET, POST, PUT, DELETE, WELD가 존재하며 WELD를 제외한 4가지는 HTTP의 Method와 일맥상통합니다.
 

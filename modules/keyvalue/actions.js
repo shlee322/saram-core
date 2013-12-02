@@ -20,8 +20,12 @@ module.exports = {
         DB.execute(ctx, 'keyvalue.get', { key : ctx.req.param.key }, function (err, rows) {
             ctx.errorTry(err, err);
             ctx.errorTry(rows.length < 1, Error.NotFound);
+            var data = { uuid:rows[0].uuid.toString() };
+            for(var name in _current.module.config.columns) {
+                data[name] = rows[0][name];
+            }
 
-            ctx.res.send({uuid:rows[0].uuid.toString(),  value:rows[0].value});
+            ctx.res.send(data);
             _current.next();
         });
     },
@@ -29,10 +33,10 @@ module.exports = {
         var _current = ctx.current;
         _current.autoNext = false;
 
-        var data = {
-            key : ctx.req.param.key,
-            value:ctx.req.body.getValue("value")
-        };
+        var data = { key : ctx.req.param.key };
+        for(var name in ctx.current.module.config.columns) {
+            data[name] = ctx.req.body.getValue(name);
+        }
 
         DB.execute(ctx, 'keyvalue.set', data, function (err, rows) {
             ctx.errorTry(err, err);

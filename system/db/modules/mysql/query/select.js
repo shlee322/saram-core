@@ -20,7 +20,7 @@ function SelectQuery(ctx, query) {
 
     rawQuery += "FROM `" + query.table + "` ";
 
-    if(query.conditions instanceof Array) {
+    if(query.conditions instanceof Array && query.conditions.length > 0) {
         rawQuery += "WHERE ";
         for(var i in query.conditions) {
             var condition = query.conditions[i];
@@ -37,7 +37,11 @@ function SelectQuery(ctx, query) {
                 rawQuery += "`" + condition.column + "`=? and ";
             }
         }
-        rawQuery = rawQuery.substring(0, rawQuery.length - 4);
+        if(rawQuery.substring(rawQuery.length - 6, rawQuery.length) != "WHERE ") {
+            rawQuery = rawQuery.substring(0, rawQuery.length - 4);
+        } else {
+            rawQuery = rawQuery.substring(0, rawQuery.length - 6);
+        }
     }
 
     this.rawQuery = rawQuery;

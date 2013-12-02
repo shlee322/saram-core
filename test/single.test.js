@@ -1,19 +1,19 @@
 var request = require('request');
 
 describe('Basic Module Test', function() {
-    describe('List', function() {
+    describe('Single', function() {
         var saram = require('saram-core');
-        var listModule = require('saram-core/modules/list/index.js');
+        var singleModule = require('saram-core/modules/single/index.js');
         var server = null;
 
         it('#Start', function(done) {
             server = saram();
             server.cache.addNode("memory:///");
             server.db.addNode("mysql://travis@127.0.0.1/saram_test");
-            server.load(listModule);
+            server.load(singleModule);
 
-            server.use('elab.list', 'list_test', { name:"list_test" });
-            server.weld('list_test', 'list');
+            server.use('elab.single', 'single_test', { name:"single_test" });
+            server.weld('single_test', 'data');
             server.protocol.addProtocol("http", { port : 7000 });
 
             server.start(done);
@@ -21,8 +21,8 @@ describe('Basic Module Test', function() {
 
         var itemUUID = "";
 
-        it('#Insert', function(done) {
-            request.post('http://127.0.0.1:7000/list/', {body:"value=test"},  function (error, response, body) {
+        it('#Set', function(done) {
+            request.post('http://127.0.0.1:7000/data/', {body:"value=test"},  function (error, response, body) {
                 if(response.statusCode!=200) {
                     done(new Error(body));
                     return;
@@ -35,25 +35,19 @@ describe('Basic Module Test', function() {
         });
 
         it('#Get', function(done) {
-            request.get('http://127.0.0.1:7000/list/' + itemUUID,  function (error, response, body) {
+            request.get('http://127.0.0.1:7000/data/',  function (error, response, body) {
                 done(response.statusCode!=200 ? new Error(body) : undefined);
             });
         });
 
         it('#Update', function(done) {
-            request.put('http://127.0.0.1:7000/list/' + itemUUID, {body:"value=1234"},  function (error, response, body) {
-                done(response.statusCode!=200 ? new Error(body) : undefined);
-            });
-        });
-
-        it('#List', function(done) {
-            request.get('http://127.0.0.1:7000/list/',  function (error, response, body) {
+            request.put('http://127.0.0.1:7000/data/', {body:"value=1234"},  function (error, response, body) {
                 done(response.statusCode!=200 ? new Error(body) : undefined);
             });
         });
 
         it('#Delete', function(done) {
-            request.del('http://127.0.0.1:7000/list/' + itemUUID, function (error, response, body) {
+            request.del('http://127.0.0.1:7000/data/', function (error, response, body) {
                 done(response.statusCode!=200 ? new Error(body) : undefined);
             });
         });

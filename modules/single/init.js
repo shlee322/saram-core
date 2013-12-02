@@ -3,25 +3,17 @@ var DB = require('../../system/db/index.js');
 var DBParam = require('../../system/db/param.js');
 var HashShard = require('../../system/db/partitioners/hashshard/index.js');
 
-
-function initKeyValueModule(ctx) {
+function initSingleModule(ctx) {
     this.config = {};
 
     this.config.name = ctx.req.body.getValue("name");
     this.config.param = ctx.req.body.getValue("param", []);
-    this.config.list = ctx.req.body.getValue("list", false);
     this.config.columns = ctx.req.body.getValue("columns", {value:{type:"string",length:256}});
 
     var param = new DBParam(this.config.param, "int64", "UNIQUE");
+    var hashshard = new HashShard([param]);
 
-    var shardingItems = [param];
-    if(!this.config.list) {
-        shardingItems.push(function(ctx, args) { return XXHash.hash(new Buffer(args.key), 0x654C6162); });
-    }
-
-    var hashshard = new HashShard(shardingItems);
-
-    var tableColumns = { 'key':'int64', 'str':{type:"string", length:64} };
+    var tableColumns = {};
     for(var name in this.config.columns) {
         tableColumns[name] = this.config.columns[name];
     }
@@ -29,27 +21,21 @@ function initKeyValueModule(ctx) {
     DB.setTable(ctx, {
         name : this.config.name,
         columns : param.getColumns(tableColumns),
-        indexes : [param.getIndex("key", [["key", "ASC"]])]
+        indexes : [param.getIndex("key", [])]
     });
 
-    var selectQueryColumns = { uuid:'uuid', str:'key' };
+    var selectQueryColumns = { uuid : 'uuid' };
     for(var name in this.config.columns) {
         selectQueryColumns[name] = name;
     }
 
+    var insertQueryColumns = { param : param };
+    for(var name in this.config.columns) {
+        insertQueryColumns[name] = name;
+    }
+
     DB.setQuery(ctx, {
-        name : "keyvalue.get",
-        action : 'select',
-        table : this.config.name,
-        partitioner:hashshard,
-        columns : selectQueryColumns,
-        conditions : [
-            { oper:'param', param:param },
-            { oper:'equal', column:'key', var: function(ctx, args) { return XXHash.hash(new Buffer(args.key), 0x654C6162); }}
-        ]
-    });
-    DB.setQuery(ctx, {
-        name : "keyvalue.list",
+        name : "single.get",
         action : 'select',
         table : this.config.name,
         partitioner:hashshard,
@@ -59,29 +45,29 @@ function initKeyValueModule(ctx) {
         ]
     });
 
-    var insertQueryColumns = {
-        param:param,
-        key:function(ctx, args) { return XXHash.hash(new Buffer(args.key), 0x654C6162); },
-        str : 'key'
-    };
-    for(var name in this.config.columns) {
-        insertQueryColumns[name] = name;
-    }
-
-    var updateQueryColumns = {};
+    var updateQueryColumns = { };
     for(var name in this.config.columns) {
         updateQueryColumns[name] = name;
     }
 
-
     DB.setQuery(ctx, {
-        name : "keyvalue.set",
+        name : "single.set",
         action : 'upsert',
         table : this.config.name,
         partitioner:hashshard,
         columns : insertQueryColumns,
         update : updateQueryColumns
     });
+
+    DB.setQuery(ctx, {
+        name : "single.delete",
+        action : 'delete',
+        table : this.config.name,
+        partitioner:hashshard,
+        conditions : [
+            { oper:'param', param:param }
+        ]
+    });
 }
 
-module.exports = initKeyValueModule;
+module.exports = initSingleModule;
