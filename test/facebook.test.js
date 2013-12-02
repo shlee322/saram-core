@@ -11,6 +11,8 @@ var client_secret = "fa03d9cf4718ee254362def1689f9935";
 
 describe('Basic Module Test', function() {
     describe('Facebook', function() {
+        this.timeout(15000);
+
         var server = null;
         var fb_token = "";
 
