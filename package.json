@@ -1,7 +1,7 @@
 {
   "name": "saram-core",
   "description": "",
-  "version": "0.1.0-dev",
+  "version": "0.1.{BuildId}-dev",
   "repository": {
       "type": "git",
       "url": "git://github.com/shlee322/saram-core.git"

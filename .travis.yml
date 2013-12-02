@@ -4,6 +4,7 @@ node_js:
 services:
 - redis-server
 before_script:
+- sed -i "s/{BuildId}/$TRAVIS_BUILD_NUMBER/g" package.json
 - mysql -e 'create database saram_test;'
 notifications:
   email: false
@@ -12,5 +13,3 @@ deploy:
   email: shlee322@gmail.com
   api_key:
     secure: JW9f2JJtRUNyBL0w2wNL2pL05r7sKatNGJiAsQcAhBi0epWO6H5ETpc8cNVJJu5bOYJxO8mDwtG9YB8cRq8d0B40imZgyH9yg287raSI+8hpdJh0BecypSPbwh35nWUKJVbTh/KE1iaLhkYKm5dhHthKnPZjdM2/0TUJ/Z558X8=
-  on:
-    tags: true

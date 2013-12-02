@@ -8,6 +8,8 @@ Saram Framework [![Build Status](https://travis-ci.org/shlee322/saram-core.png?b
 
 Get Started
 ---------------------------
+[![NPM](https://nodei.co/npm/saram-core.png)](https://nodei.co/npm/saram-core/)
+
 설치 : `npm install saram-core`
 
 app.js
