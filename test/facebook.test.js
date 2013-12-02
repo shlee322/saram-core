@@ -33,8 +33,8 @@ describe('Basic Module Test', function() {
 
             server.use('elab.user', 'user');
             server.modules.use('elab.facebook', 'facebook', {
-                client_id:'344345942352122',
-                client_secret:'secret',
+                client_id:client_id,
+                client_secret:client_secret,
                 url:'http://127.0.0.1:7000/facebook',
                 state:'',
                 user:'user'
