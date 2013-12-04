@@ -1,6 +1,7 @@
 var Call = require('./call.js');
 var Log = require('../log/index.js');
 var Viewer = require('../viewer/index.js');
+var RoutineError = require('./errors.js');
 
 function request(ctx, bundle) {
     bundle = bundle ? bundle : ctx.getSaram().getCoreModule().getBundle();
@@ -9,7 +10,7 @@ function request(ctx, bundle) {
 
     ctx.run(function () {
         var pipeline = bundle.getPipeline(ctx.req.method, ctx.req.path);
-        ctx.errorTry(!pipeline.found, Error);
+        ctx.errorTry(!pipeline.found, RoutineError.NotFound);
         routine(ctx, pipeline, function () {
             ctx.errorTry(!ctx.req.body.isRead(), Error); //용량 큼
             ctx.res.sendResponse();
