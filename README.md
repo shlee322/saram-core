@@ -12,16 +12,6 @@ Get Started
 
 설치 : `npm install saram-core`
 
-app.js
-```javascript
-var saram = require('saram-core');
-
-var server = saram();
-server.start(function() {
-    console.log("Start");
-});
-```
-
 saram.xml
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -36,6 +26,9 @@ saram.xml
     </module>
 </saram>
 ```
+
+간편 실행 : `node ./node_modules/saram-core/tools/app.js`
+
 
 위의 코드는 Root Module 안에 List Module을 연결(Weld)한 예제입니다.
 
