@@ -36,14 +36,15 @@ saram.xml
 
 각 모듈의 자세한 사용법은 각 모듈 디렉토리 내의 README를 참고하십시오.
 
-- [Account Module](https://github.com/shlee322/saram-core/tree/master/modules/account/README.md)
-- [Facebook Module](https://github.com/shlee322/saram-core/tree/master/modules/facebook/README.md)
-- [KeyValue Module](https://github.com/shlee322/saram-core/tree/master/modules/keyvalue/README.md)
 - [List Module](https://github.com/shlee322/saram-core/tree/master/modules/list/README.md)
+- [KeyValue Module](https://github.com/shlee322/saram-core/tree/master/modules/keyvalue/README.md)
+- [Single Module](https://github.com/shlee322/saram-core/tree/master/modules/single/README.md)
+- [Account Module](https://github.com/shlee322/saram-core/tree/master/modules/account/README.md)
+- [User Module](https://github.com/shlee322/saram-core/tree/master/modules/user/README.md)
+- [Facebook Module](https://github.com/shlee322/saram-core/tree/master/modules/facebook/README.md)
 - [Push Module](https://github.com/shlee322/saram-core/tree/master/modules/push/README.md)
 - [Simauth Module](https://github.com/shlee322/saram-core/tree/master/modules/simauth/README.md)
 - [Social Module](https://github.com/shlee322/saram-core/tree/master/modules/social/README.md)
-- [User Module](https://github.com/shlee322/saram-core/tree/master/modules/user/README.md)
 
 
 Config File
