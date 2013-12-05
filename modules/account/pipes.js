@@ -1,6 +1,6 @@
 /*
  POST /signup : 가입, 서버전용
- GET /signin : 로그인, 서버전용
+ POST /signin : 로그인, 서버전용
 */
 
 module.exports = [

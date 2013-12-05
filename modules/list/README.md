@@ -16,8 +16,8 @@ load : `saram-core/modules/list/`
 ### javascript 버전
 
 ```javascript
-server.modules.use('elab.list', 'list', { name:"test" }); //원하는 DB Table 이름
-server.weld('test', 'test');
+server.modules.use('elab.list', 'test', { name:"test" }); //원하는 DB Table 이름
+server.modules.weld('test', 'test');
 ```
 
 # Pipes(URLs)
