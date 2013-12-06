@@ -10,7 +10,13 @@ Get Started
 ---------------------------
 [![NPM](https://nodei.co/npm/saram-core.png)](https://nodei.co/npm/saram-core/)
 
+앞으로 서버 프로젝트를 저장할 디렉토리를 생성한 이후 해당 디렉토리 안에서 다음 순서를 진행합니다.
+
 설치 : `npm install saram-core`
+
+아래 코드는 Root Module 안에 List Module을 연결(Weld)하여 서버를 구성한 예제입니다.
+
+`GET /test/`를 통하여 리스트에 접근 할 수 있습니다.
 
 saram.xml
 ```xml
@@ -27,12 +33,10 @@ saram.xml
 </saram>
 ```
 
-간편 실행 : `node ./node_modules/saram-core/tools/app.js`
+간편 실행 : `node ./node_modules/saram-core/tools/app.js -c saram.xml`
 
+`-c saram.xml`은 생략이 가능한 설정파일을 로드하는 `-c <path>`의 기본값입니다.
 
-위의 코드는 Root Module 안에 List Module을 연결(Weld)한 예제입니다.
-
-`GET /test/`를 통하여 리스트에 접근 할 수 있습니다.
 
 각 모듈의 자세한 사용법은 각 모듈 디렉토리 내의 README를 참고하십시오.
 
